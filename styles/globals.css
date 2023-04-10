@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './bars.css';
+
 html,
 body {
     max-width: 100vw;

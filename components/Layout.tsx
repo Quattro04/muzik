@@ -9,7 +9,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useSongs } from '@/context/SongsContext';
+import { PlayedSong, useSongs } from '@/context/SongsContext';
+import Player from './Player';
 
 export default function Layout({ children }: { children: ReactNode }) {
 
@@ -17,7 +18,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [uploadModalOpened, setUploadModalOpened] = useState<boolean>(false);
 
-    const { songs, fetchSongs } = useSongs();
+    const { playedSong, songs, fetchSongs } = useSongs();
 
     const onSearchSubmit = (e: FormEvent) => {
         router.push(`/search?q=${searchQuery}`);
@@ -41,7 +42,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                     <nav className="flex-1 border-gray-200 px-4 lg:px-6 py-2.5 bg-gray-800">
                         <div className="flex flex-1 flex-wrap justify-between items-center mx-auto max-w-screen-xl">
                             <Link href="/" className="flex items-center">
-                                <Image src="/logo.png" width="40" height="40" className="mr-3" alt="Muzik Logo" />
+                                <Image src="/logo.png" width="40" height="40" className="mr-6" alt="Muzik Logo" />
                                 <span className="self-center text-xl font-semibold whitespace-nowrap text-white">Muzik</span>
                             </Link>
                             <div className="flex items-center lg:order-2">
@@ -85,9 +86,14 @@ export default function Layout({ children }: { children: ReactNode }) {
                         </div>
                     </nav>
                 </header>
-                <div className="flex flex-1 w-full flex-col bg-darkblue">
+                <div className="flex flex-1 w-full flex-col bg-darkblue overflow-auto">
                     {children}
                 </div>
+                {playedSong &&
+                    <div className="flex bg-darkblue">
+                        <Player />
+                    </div>
+                }
             </main>
             <Modal opened={uploadModalOpened} onClose={onUploadModalClose} />
             <ToastContainer />

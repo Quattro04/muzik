@@ -20,10 +20,17 @@ export const YtUploadModal = (
 ) => {
 
     const [open, setOpen] = useState<boolean>(false);
+
     const [artist, setArtist] = useState<string>('');
     const [title, setTitle] = useState<string>('');
+    const [releaseYear, setReleaseYear] = useState<string>('');
+    const [image, setImage] = useState<string>('');
+
     const [artistError, setArtistError] = useState<boolean>(false);
     const [titleError, setTitleError] = useState<boolean>(false);
+    const [releaseYearError, setReleaseYearError] = useState<boolean>(false);
+    const [imageError, setImageError] = useState<boolean>(false);
+
     const [loading, setLoading] = useState<boolean>(false);
 
     const closeModal = () => {
@@ -49,6 +56,18 @@ export const YtUploadModal = (
         } else {
             setTitleError(false);
         }
+        if (releaseYear.length !== 4) {
+            setReleaseYearError(true);
+            return;
+        } else {
+            setReleaseYearError(false);
+        }
+        if (image === '') {
+            setImageError(true);
+            return;
+        } else {
+            setImageError(false);
+        }
 
         postYtUrl();
     };
@@ -63,16 +82,44 @@ export const YtUploadModal = (
         setTitleError(false);
     }
 
+    const releaseYearChange = (e: any) => {
+        setReleaseYear(e.target.value);
+        setReleaseYearError(false);
+    }
+
+    const imageChange = (e: any) => {
+        setImage(e.target.value);
+        setImageError(false);
+    }
+
     useEffect(() => {
         setOpen(opened);
-        if (selectedYtVideo !== undefined && selectedYtVideo.title !== '') {
-            const arr = selectedYtVideo.title.split('-');
-            if (arr.length > 1) {
-                setArtist(arr[0].trim())
-                setTitle(arr[1].trim())
+        if (selectedYtVideo !== undefined) {
+            if (selectedYtVideo.title !== '') {
+                const arr = selectedYtVideo.title.split('-');
+                if (arr.length > 1) {
+                    setArtist(arr[0].trim());
+                    arr.shift();
+                    setTitle(arr.join('-').trim());
+                }
+            }
+            if (selectedYtVideo.ago !== undefined && selectedYtVideo.ago !== '') {
+                setReleaseYear(agoToYear(selectedYtVideo.ago))
+            }
+            if (selectedYtVideo.image !== undefined && selectedYtVideo.image !== '') {
+                setImage(selectedYtVideo.image);
             }
         }
     }, [opened, onClose])
+
+    const agoToYear = (ago: string): string => {
+        const currentYear = new Date().getFullYear();
+        if (!ago.includes('year')) return currentYear.toString();
+
+        const yearsAgo = ago.slice(0, 2).trim();
+        const year = currentYear - Number(yearsAgo);
+        return year.toString()
+    }
 
     const postYtUrl = async () => {
 
@@ -83,9 +130,10 @@ export const YtUploadModal = (
         const body = {
             id: selectedYtVideo.videoId,
             url: selectedYtVideo.url,
-            image: selectedYtVideo.image,
+            image,
             duration: selectedYtVideo.seconds,
             timestamp: selectedYtVideo.timestamp,
+            releaseYear,
             artist,
             title
         }
@@ -152,6 +200,22 @@ export const YtUploadModal = (
                             placeholder="Title"
                             value={title}
                             onChange={titleChange}
+                        />
+                        <input
+                            disabled={loading}
+                            type="number"
+                            className={`p-3 rounded-lg outline-0 border-2 ${releaseYearError ? 'border-red-500' : 'border-transparent'}`}
+                            placeholder="Release year"
+                            value={releaseYear}
+                            onChange={releaseYearChange}
+                        />
+                        <input
+                            disabled={loading}
+                            type="text"
+                            className={`p-3 rounded-lg outline-0 border-2 ${imageError ? 'border-red-500' : 'border-transparent'}`}
+                            placeholder="Image"
+                            value={image}
+                            onChange={imageChange}
                         />
                     </div>
                     <div className="flex items-center justify-end p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">

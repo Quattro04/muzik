@@ -1,73 +1,24 @@
 import Head from 'next/head'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import Player from '@/components/Player'
 import Layout from '@/components/Layout'
 import { useSongs } from '@/context/SongsContext'
-
-export interface Song {
-    file: string;
-    title: string;
-    artist: string;
-    duration: number;
-    releaseYear: string;
-    image: string;
-    createdAt: string;
-}
-
-export interface PlayedSong extends Song {
-    audioSrc: string | undefined;
-}
+import BarsAnimaiton from '@/components/BarsAnimation'
+import { useRouter } from 'next/router'
 
 export default function Home() {
 
-    const [playedSong, setPlayedSong] = useState<PlayedSong | undefined>(undefined);
+    const [isLoading, setLoading] = useState(true)
+    const { songs, playedSong, isPlaying, fetchSongs, playSong } = useSongs();
 
-    const { songs, fetchSongs } = useSongs();
+    const router = useRouter();
 
-    const fetchSong = (song: Song) => {
-        fetch(`http://localhost:3000/song/${song.file}`, {
-            headers: {
-                'Authentication': process.env.NEXT_PUBLIC_AUTH_TOKEN as string
-            }
-        })
-        .then((response) => {
-            const reader = response.body?.getReader();
-            return new ReadableStream({
-            start(controller) {
-                const pump = (): any => {
-                    return reader?.read().then(({ done, value }) => {
-                        if (done) {
-                            controller.close();
-                            return;
-                        }
-                        controller.enqueue(value);
-                        return pump();
-                    });
-                }
-                return pump();
-            },
-            });
-        })
-        .then((stream) => new Response(stream))
-        .then((response) => response.blob())
-        .then((blob) => URL.createObjectURL(blob))
-        .then((url) => {
-            setPlayedSong({
-                ...song,
-                audioSrc: url
-            })
-        })
-        .catch((err) => console.error(err));
-    }
-
-    const parseSeconds = (s: number): string => {
-        const seconds = Math.round(s);
-        const secondsLeft = seconds % 60;
-        const secondsLeftString = secondsLeft < 10 ? `0${secondsLeft}` : secondsLeft;
-        const minutes = Math.floor(seconds / 60);
-        return `${minutes}:${secondsLeftString}`;
-    }
+    useEffect(() => {
+        fetchSongs(() => {
+            setLoading(false)
+        });
+    }, [])
 
     return (
         <>
@@ -78,19 +29,27 @@ export default function Home() {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <Layout>
-                <ul className="flex w-full flex-col mb-auto divide-y divide-lightblue mx-auto max-w-screen-xl">
-                    {songs.map((song, idx) =>
-                        <li className="flex items-center flex-1 cursor-pointer border-b-1 border-sky-500" key={idx} onClick={() => fetchSong(song)}>
-                            <img className="mr-8 rounded" src={song.image} width={40} height={40} alt="Art cover" />
-                            <span className="text-white flex-1 py-6 text-sm">{song.title}</span>
-                            <span className="text-white flex-1 py-6 text-sm opacity-80">{song.artist}</span>
-                            <span className="text-white py-6 text-sm opacity-80" style={{ flexBasis: '40px' }}>{parseSeconds(song.duration)}</span>
-                        </li>
-                    )}
-                </ul>
-                <div className="flex">
-                    <Player song={playedSong} />
-                </div>
+                {!isLoading &&
+                    <ul className="flex w-full flex-col mb-auto divide-y divide-lightblue mx-auto max-w-screen-xl">
+                        {songs.map((song, idx) =>
+                            <li
+                                key={idx}
+                                className={`basis-12 flex items-center flex-1 pr-4 cursor-pointer rounded ${playedSong?.index === idx ? 'bg-lightblue' : ''}`}
+                                onClick={() => playSong(song, idx)}
+                            >
+                                {(playedSong?.index !== idx || !isPlaying) &&
+                                    <img className="mr-8 rounded" src={song.image} width={55} height={40} alt="Art cover" />
+                                }
+                                {playedSong?.index === idx && isPlaying &&
+                                    <BarsAnimaiton className="mr-8" width={55} height={40} />
+                                }
+                                <span className="text-white flex-1 text-sm">{song.title}</span>
+                                <span className="text-white flex-1 text-sm opacity-80">{song.artist}</span>
+                                <span className="text-white text-sm opacity-80" style={{ flexBasis: '40px' }}>{song.releaseYear}</span>
+                            </li>
+                        )}
+                    </ul>
+                }
             </Layout>
         </>
     )

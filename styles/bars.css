@@ -1,0 +1,159 @@
+
+.bars-animation.playing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 15px;
+}
+
+.bars-animation.playing:after {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+}
+.bars-animation.now.playing .bar {
+  display: inline-block;
+  position: relative;
+  margin-right: 1px;
+  width: 3px;
+  height: 1px;
+  overflow: hidden;
+  background: linear-gradient(to bottom, #08c97d, #3d92c3);
+  color: transparent;
+  
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+}
+.bars-animation .n1 {
+  animation-name: pulse;
+}
+.bars-animation .n2 {
+  animation-name: pulse1;
+}
+.bars-animation .n3 {
+  animation-name: pulse2;
+}
+.bars-animation .n4 {
+  animation-name: pulse3;
+}
+/* .bars-animation .n5 {
+  animation-delay: 2.3s;
+}
+.bars-animation .n6 {
+  animation-delay: 1.3s;
+}
+.bars-animation .n7 {
+  animation-delay: 3.1s;
+}
+.bars-animation .n8 {
+  animation-delay: 1.9s;
+} */
+@keyframes pulse {
+  0% {
+    height: 1px;
+    margin-top: 0;
+  }
+  10% {
+    height: 15px;
+    margin-top: -15px;
+  }
+  50% {
+    height: 5px;
+    margin-top: -5px;
+  }
+  60% {
+    height: 10px;
+    margin-top: -10px;
+  }
+  80% {
+    height: 15px;
+    margin-top: -15px;
+  }
+  100% {
+    height: 1px;
+    margin-top: 0;
+  }
+}
+@keyframes pulse1 {
+  0% {
+    height: 5px;
+    margin-top: -5px;
+  }
+  30% {
+    height: 15px;
+    margin-top: -15px;
+  }
+  50% {
+    height: 10px;
+    margin-top: -10px;
+  }
+  60% {
+    height: 15px;
+    margin-top: -15px;
+  }
+  70% {
+    height: 10px;
+    margin-top: -10px;
+  }
+  100% {
+    height: 5px;
+    margin-top: -5px;
+  }
+}
+@keyframes pulse2 {
+  0% {
+    height: 15px;
+    margin-top: -15px;
+  }
+  10% {
+    height: 1px;
+    margin-top: 0;
+  }
+  50% {
+    height: 5px;
+    margin-top: -5px;
+  }
+  60% {
+    height: 10px;
+    margin-top: -10px;
+  }
+  80% {
+    height: 5px;
+    margin-top: -5px;
+  }
+  100% {
+    height: 15px;
+    margin-top: -15px;
+  }
+}
+@keyframes pulse3{
+  0% {
+    height: 10px;
+    margin-top: -10px;
+  }
+  20% {
+    height: 5px;
+    margin-top: -5px;
+  }
+  40% {
+    height: 10px;
+    margin-top: -10px;
+  }
+  50% {
+    height: 15px;
+    margin-top: -15px;
+  }
+  70% {
+    height: 1px;
+    margin-top: 0;
+  }
+  100% {
+    height: 10px;
+    margin-top: -10px;
+  }
+}
+.bars-animation button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
