@@ -44,7 +44,7 @@ export default function Search() {
     const fetchYtData = async () => {
         setLoading(true);
         const q = router.asPath.split('?q=').pop();
-        const res = await fetch(`http://localhost:3000/yt-search?q=${q}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/yt-search?q=${q}`, {
             headers: {
                 'Authentication': process.env.NEXT_PUBLIC_AUTH_TOKEN as string
             }

@@ -86,7 +86,7 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
         body.append('cover', cover);
         body.append('file', uploadedFile);
 
-        const res = await fetch("http://localhost:3000/upload", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
             method: "POST",
             headers: {
                 'Authentication': process.env.NEXT_PUBLIC_AUTH_TOKEN as string

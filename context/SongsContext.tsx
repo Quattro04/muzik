@@ -47,7 +47,7 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
     const fetchData = async (callback?: () => void) => {
-        const res = await fetch('http://localhost:3000/songs', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/songs`, {
         headers: {
             'Authentication': process.env.NEXT_PUBLIC_AUTH_TOKEN as string
             }
@@ -58,7 +58,7 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
     }
 
     const fetchSong = (song: Song, idx: number) => {
-        fetch(`http://localhost:3000/song/${song.file}`, {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/song/${song.file}`, {
             headers: {
                 'Authentication': process.env.NEXT_PUBLIC_AUTH_TOKEN as string
             }

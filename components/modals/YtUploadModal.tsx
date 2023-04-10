@@ -139,7 +139,7 @@ export const YtUploadModal = (
         }
 
         try {
-            const res = await fetch('http://localhost:3000/yt-add', {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/yt-add`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
