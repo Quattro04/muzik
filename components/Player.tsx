@@ -3,10 +3,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faPlay,
     faPause,
+    faBackward,
+    faForward,
     faVolumeHigh
 } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PlayedSong, useSongs } from "@/context/SongsContext";
+import next from "next/types";
 
 export default function Player() {
 
@@ -18,9 +21,22 @@ export default function Player() {
     const [changingSongVolume, setChangingSongVolume] = useState<boolean>(false);
     const playAnimationRef = useRef(0);
 
-    const { playedSong, queueNextSong, stop, isPlaying, setIsPlaying} = useSongs();
+    const { playedSong, nextSong, repeatSong, stop, isPlaying, setIsPlaying,} = useSongs();
 
     useEffect(() => {
+        navigator.mediaSession.setActionHandler('play', function() {
+            play();
+        });
+        navigator.mediaSession.setActionHandler('pause', function() {
+            pause();
+        });
+        navigator.mediaSession.setActionHandler('previoustrack', function() {
+            repeatSong();
+        });
+        navigator.mediaSession.setActionHandler('nexttrack', function() {
+            nextSong();
+        });
+
         return () => {
             stop();
             cancelAnimationFrame(playAnimationRef.current);
@@ -33,7 +49,7 @@ export default function Player() {
     useEffect(() => {
         if (playedSong && playedSong.audioSrc && audioRef.current) {
             audioRef.current.onended = () => {
-                queueNextSong();
+                nextSong();
             };
             audioRef.current.onloadeddata = () => {
                 play();
@@ -119,11 +135,24 @@ export default function Player() {
                 {playedSong &&
                     <span className="text-xs text-green flex-1">{parseSeconds(songCurrentTime)}</span>
                 }
-                <FontAwesomeIcon
-                    icon={isPlaying ? faPause : faPlay}
-                    style={{ fontSize: 20, color: "white", padding: '10px 15px', cursor: 'pointer' }}
-                    onClick={() => isPlaying ? pause() : play()}
-                />
+                <div className="flex items-center">
+                    <FontAwesomeIcon
+                        icon={faBackward}
+                        style={{ fontSize: 12, color: "white", padding: '10px 15px', cursor: 'pointer' }}
+                        onClick={() => repeatSong()}
+                    />
+                    <FontAwesomeIcon
+                        icon={isPlaying ? faPause : faPlay}
+                        style={{ fontSize: 20, color: "white", padding: '10px 15px', cursor: 'pointer' }}
+                        onClick={() => isPlaying ? pause() : play()}
+                    />
+                    <FontAwesomeIcon
+                        icon={faForward}
+                        style={{ fontSize: 12, color: "white", padding: '10px 15px', cursor: 'pointer' }}
+                        onClick={() => nextSong()}
+                    />
+                </div>
+                
                 <div className="flex items-center absolute" style={{ right: '80px' }}>
                     <div
                         className="flex items-center w-32 h-4 mr-3 cursor-pointer"

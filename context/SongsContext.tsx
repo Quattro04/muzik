@@ -7,7 +7,8 @@ interface SongsCtx {
     playSong: (_: Song, idx: number) => void;
     isPlaying: boolean;
     setIsPlaying: (_: boolean) => void;
-    queueNextSong: () => void;
+    nextSong: () => void;
+    repeatSong: () => void;
     stop: () => void;
 };
 
@@ -19,7 +20,8 @@ const SongsContext = createContext<SongsCtx>(
         playSong: () => {},
         isPlaying: false,
         setIsPlaying: () => {},
-        queueNextSong: () => {},
+        nextSong: () => {},
+        repeatSong: () => {},
         stop: () => {}
     }
 );
@@ -94,8 +96,17 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
         .catch((err) => console.error(err));
     }
 
-    const queueNextSong = () => {
+    const nextSong = () => {
+        const randomSong = Math.floor(Math.random() * songs.length);
+        fetchSong(songs[randomSong], randomSong);
+    }
 
+    const repeatSong = () => {
+        const currSong = songs.find(s => s.file === playedSong?.file);
+        if (currSong) {
+            const idx = songs.findIndex(s => s === currSong);
+            fetchSong(currSong, idx);
+        }
     }
 
     const stop = () => {
@@ -117,7 +128,8 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
                 playSong: fetchSong,
                 isPlaying,
                 setIsPlaying,
-                queueNextSong,
+                nextSong,
+                repeatSong,
                 stop
             }}
         >
