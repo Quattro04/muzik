@@ -49,10 +49,11 @@ export default function Player() {
     useEffect(() => {
         if (playedSong && playedSong.audioSrc && audioRef.current) {
             audioRef.current.onended = () => {
-                nextSong();
+                // nextSong();
             };
+
             audioRef.current.onloadeddata = () => {
-                play();
+                // play();
                 const localVol = localStorage.getItem('volume');
                 if (localVol) {
                     volumeSet(Number(localVol));
@@ -60,22 +61,28 @@ export default function Player() {
                     volumeSet(audioRef.current?.volume ? audioRef.current?.volume : 0);
                 }
             };
-            audioRef.current.src = playedSong.audioSrc;
+            audioRef.current.src = "data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV";
             setSongDuration(playedSong.duration)
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playedSong])
 
     const play = () => {
-        audioRef.current?.play();
-        playAnimationRef.current = requestAnimationFrame(repeat);
-        setIsPlaying(true);
+        if (audioRef.current && playedSong?.audioSrc) {
+            audioRef.current.src = playedSong.audioSrc;
+        }
+        // audioRef.current?.play();
+        // playAnimationRef.current = requestAnimationFrame(repeat);
+        // setIsPlaying(true);
     }
 
     const pause = () => {
-        audioRef.current?.pause();
-        setIsPlaying(false);
-        cancelAnimationFrame(playAnimationRef.current);
+        if (audioRef.current && playedSong?.audioSrc) {
+            audioRef.current.src = playedSong.audioSrc;
+        }
+        // audioRef.current?.pause();
+        // setIsPlaying(false);
+        // cancelAnimationFrame(playAnimationRef.current);
     }
 
     const repeatSong = () => {
@@ -125,7 +132,7 @@ export default function Player() {
                 style={{ height: '20px', marginTop: -24 }}
                 onMouseUp={timeSkip}
             />
-            {/* <div className="flex items-center justify-center w-full">
+            <div className="flex items-center justify-center w-full">
                 {playedSong &&
                     <span className="text-xs text-green flex-1">{parseSeconds(songCurrentTime)}</span>
                 }
@@ -152,8 +159,8 @@ export default function Player() {
                 {playedSong &&
                     <span className="text-xs text-white flex-1 flex justify-end">{parseSeconds(songDuration)}</span>
                 }
-            </div> */}
-            <audio className="w-full" ref={audioRef} controls />
+            </div>
+            <audio className="w-full" ref={audioRef} controls autoPlay={true} />
         </div>
     )
 }
