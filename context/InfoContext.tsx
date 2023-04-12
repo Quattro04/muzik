@@ -1,31 +1,34 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 
 interface InfoCtx {
-    os: string;
+    isIos: boolean;
     browser: string;
 };
 
 const InfoContext = createContext<InfoCtx>(
     {
-        os: '',
+        isIos: false,
         browser: ''
     }
 );
 
 export function InfoContextProvider({ children }: { children: ReactNode }) {
 
-    const [os, setOs] = useState<string>('');
+    const [isIos, setIsIos] = useState<boolean>(false);
     const [browser, setBrowser] = useState<string>('');
 
-    const getOperatingSystem = () => {
-        let operatingSystem = 'Not known';
-        if (window.navigator.appVersion.indexOf('Win') !== -1) { operatingSystem = 'Windows OS'; }
-        if (window.navigator.appVersion.indexOf('Mac') !== -1) { operatingSystem = 'MacOS'; }
-        if (window.navigator.appVersion.indexOf('X11') !== -1) { operatingSystem = 'UNIX OS'; }
-        if (window.navigator.appVersion.indexOf('Linux') !== -1) { operatingSystem = 'Linux OS'; }
-      
-        return operatingSystem;
-    }
+    const iOS = () => {
+        return [
+          'iPad Simulator',
+          'iPhone Simulator',
+          'iPod Simulator',
+          'iPad',
+          'iPhone',
+          'iPod'
+        ].includes(navigator.userAgent)
+        // iPad on iOS 13 detection
+        || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+      }
       
     const getBrowser = () => {
         let currentBrowser = 'Not known';
@@ -42,14 +45,14 @@ export function InfoContextProvider({ children }: { children: ReactNode }) {
     }
 
     useEffect(() => {
-        setOs(getOperatingSystem);
+        setIsIos(iOS);
         setBrowser(getBrowser);
     }, [])
 
     return (
         <InfoContext.Provider
             value={{
-                os,
+                isIos,
                 browser
             }}
         >

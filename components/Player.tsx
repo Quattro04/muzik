@@ -22,7 +22,7 @@ export default function Player() {
     const playAnimationRef = useRef(0);
 
     const { playedSong, nextSong, stop, isPlaying, setIsPlaying,} = useSongs();
-    const { os, browser} = useInfo();
+    const { isIos, browser} = useInfo();
 
     useEffect(() => {
         navigator.mediaSession.setActionHandler('play', function() {
@@ -61,7 +61,7 @@ export default function Player() {
                 }
             };
 
-            if (browser === 'Safari') {
+            if (isIos) {
                 audioRef.current.src = `https://193.77.22.228/song/${encodeURI(playedSong.file)}`;
             } else {
                 audioRef.current.src = playedSong.audioSrc;
