@@ -69,7 +69,7 @@ export default function Player() {
 
     const play = () => {
         if (audioRef.current && playedSong?.audioSrc) {
-            audioRef.current.src = playedSong.audioSrc;
+            audioRef.current.src = "https://193.77.22.228/song/Ava%20Max%20-%20Kings%20&%20Queens.mp3";
         }
         // audioRef.current?.play();
         // playAnimationRef.current = requestAnimationFrame(repeat);
