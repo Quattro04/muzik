@@ -45,7 +45,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
     return (
         <>
-            <main className="flex flex-1 flex-col h-screen">
+            <main className="flex flex-1 flex-col">
                 <header className="flex w-full">
                     <nav className="flex-1 border-gray-200 px-4 lg:px-6 py-2.5 bg-gray-800">
                         <div className="flex flex-1 flex-wrap justify-between items-center mx-auto max-w-screen-xl">
@@ -97,14 +97,12 @@ export default function Layout({ children }: { children: ReactNode }) {
                         </div>
                     </nav>
                 </header>
-                <div className="flex flex-1 w-full flex-col bg-darkblue overflow-auto">
+                <div className="flex flex-1 w-full flex-col bg-darkblue overflow-auto pb-20">
                     {children}
                 </div>
-                {playedSong &&
-                    <div className="flex bg-darkblue">
-                        <Player />
-                    </div>
-                }
+                <div className="fixed bottom-0 w-full flex bg-darkblue">
+                    <Player />
+                </div>
             </main>
             <Modal opened={uploadModalOpened} onClose={onUploadModalClose} />
             <ToastContainer />
