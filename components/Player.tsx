@@ -51,7 +51,8 @@ export default function Player() {
             };
 
             audioRef.current.onloadeddata = () => {
-                // play();
+                playAnimationRef.current = requestAnimationFrame(repeat);
+                setIsPlaying(true);
                 const localVol = localStorage.getItem('volume');
                 if (localVol) {
                     volumeSet(Number(localVol));
