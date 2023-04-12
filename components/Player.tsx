@@ -10,15 +10,15 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PlayedSong, useSongs } from "@/context/SongsContext";
 import next from "next/types";
+import VolumeSlider from "./VolumeSlider";
 
 export default function Player() {
 
     const audioRef = useRef<HTMLAudioElement>(null);
     // const [playing, setPlaying] = useState<boolean>(false);
+    const [songVolume, setSongVolume] = useState<number>(0);
     const [songCurrentTime, setSongCurrentTime] = useState<number>(0);
     const [songDuration, setSongDuration] = useState<number>(0);
-    const [songVolume, setSongVolume] = useState<number>(0);
-    const [changingSongVolume, setChangingSongVolume] = useState<boolean>(false);
     const playAnimationRef = useRef(0);
 
     const { playedSong, nextSong, stop, isPlaying, setIsPlaying,} = useSongs();
@@ -91,25 +91,6 @@ export default function Player() {
         }
     }
 
-    const volumeSet = (volume: number) => {
-        if (audioRef.current === null) return;
-        audioRef.current.volume = volume;
-        setSongVolume(volume);
-        localStorage.setItem('volume', volume.toString())
-    }
-
-    const onVolumeMouseMove = (event: any) => {
-        if (!changingSongVolume) return;
-        const desiredVolume = event.pageX - event.target.getBoundingClientRect().left;
-        const vol = desiredVolume / event.target.getBoundingClientRect().width;
-        volumeSet(vol)
-    }
-
-    const onVolumeMouseUp = (event: any) => {
-        onVolumeMouseMove(event);
-        setChangingSongVolume(false);
-    }
-
     const repeat = useCallback(() => {
         const currentTime = audioRef.current?.currentTime;
         if (currentTime) {
@@ -126,6 +107,13 @@ export default function Player() {
         return `${minutes}:${secondsLeftString}`;
     }
 
+    const volumeSet = (volume: number) => {
+        if (audioRef.current === null) return;
+        audioRef.current.volume = volume;
+        localStorage.setItem('volume', volume.toString())
+        setSongVolume(volume);
+    }
+
     return (
         <div className="flex flex-1 justify-center align-center p-3 border-lightblue border-t-2">
             <div
@@ -137,7 +125,7 @@ export default function Player() {
                 style={{ height: '20px', marginTop: -24 }}
                 onMouseUp={timeSkip}
             />
-            <div className="flex items-center justify-center w-full">
+            {/* <div className="flex items-center justify-center w-full">
                 {playedSong &&
                     <span className="text-xs text-green flex-1">{parseSeconds(songCurrentTime)}</span>
                 }
@@ -158,28 +146,14 @@ export default function Player() {
                         onClick={() => nextSong()}
                     />
                 </div>
-                
-                <div className="flex items-center absolute" style={{ right: '80px' }}>
-                    <div
-                        className="flex items-center w-32 h-4 mr-3 cursor-pointer"
-                        onMouseDown={() => setChangingSongVolume(true)}
-                        onMouseMove={onVolumeMouseMove}
-                        onMouseUp={onVolumeMouseUp}
-                    >
-                        <div className="w-full bg-lightblue rounded pointer-events-none" style={{ height: '4px' }}>
-                            <div className="bg-blue rounded pointer-events-none" style={{ width: `${songVolume * 100}%`, height: '4px' }} />
-                        </div>
-                    </div>
-                    <FontAwesomeIcon
-                        icon={faVolumeHigh}
-                        style={{ fontSize: 12, color: "white" }}
-                    />
+                <div className="hidden sm:flex items-center absolute" style={{ right: '80px' }}>
+                    <VolumeSlider volume={songVolume} onChange={volumeSet} />
                 </div>
                 {playedSong &&
                     <span className="text-xs text-white flex-1 flex justify-end">{parseSeconds(songDuration)}</span>
                 }
-            </div>
-            <audio ref={audioRef} />
+            </div> */}
+            <audio className="w-full" ref={audioRef} controls />
         </div>
     )
 }
