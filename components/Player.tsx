@@ -61,11 +61,11 @@ export default function Player() {
                 }
             };
 
-            if (isIos) {
-                audioRef.current.src = `https://193.77.22.228/song/${encodeURI(playedSong.file)}`;
-            } else {
+            // if (isIos) {
+                // audioRef.current.src = `https://193.77.22.228/song/${encodeURI(playedSong.file)}`;
+            // } else {
                 audioRef.current.src = playedSong.audioSrc;
-            }
+            // }
             setSongDuration(playedSong.duration)
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
