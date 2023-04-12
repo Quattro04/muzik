@@ -21,7 +21,7 @@ export default function Player() {
     const [changingSongVolume, setChangingSongVolume] = useState<boolean>(false);
     const playAnimationRef = useRef(0);
 
-    const { playedSong, nextSong, repeatSong, stop, isPlaying, setIsPlaying,} = useSongs();
+    const { playedSong, nextSong, stop, isPlaying, setIsPlaying,} = useSongs();
 
     useEffect(() => {
         navigator.mediaSession.setActionHandler('play', function() {
@@ -76,6 +76,12 @@ export default function Player() {
         audioRef.current?.pause();
         setIsPlaying(false);
         cancelAnimationFrame(playAnimationRef.current);
+    }
+
+    const repeatSong = () => {
+        if (audioRef.current) {
+            audioRef.current.currentTime = 0;
+        }
     }
 
     const timeSkip = (event: any) => {
