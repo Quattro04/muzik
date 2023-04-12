@@ -69,7 +69,7 @@ export default function Player() {
                         if (audioRef.current) {
                             audioRef.current.src = `https://193.77.22.228/song/${encodeURI(playedSong.file)}`;
                         }
-                    }, 100)
+                    }, 1000)
                     setFirstTime(false);
                 } else {
                     audioRef.current.src = `https://193.77.22.228/song/${encodeURI(playedSong.file)}`;
