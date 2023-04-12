@@ -5,12 +5,12 @@ import {
     faPause,
     faBackward,
     faForward,
-    faVolumeHigh
 } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { PlayedSong, useSongs } from "@/context/SongsContext";
+import { useSongs } from "@/context/SongsContext";
 import next from "next/types";
 import VolumeSlider from "./VolumeSlider";
+import { useInfo } from "@/context/InfoContext";
 
 export default function Player() {
 
@@ -22,6 +22,7 @@ export default function Player() {
     const playAnimationRef = useRef(0);
 
     const { playedSong, nextSong, stop, isPlaying, setIsPlaying,} = useSongs();
+    const { os, browser} = useInfo();
 
     useEffect(() => {
         navigator.mediaSession.setActionHandler('play', function() {
@@ -40,16 +41,13 @@ export default function Player() {
         return () => {
             stop();
             cancelAnimationFrame(playAnimationRef.current);
-            // if (audioRef.current && audioRef.current.src) {
-            //     audioRef.current.src = '';
-            // }
         }
     }, [])
 
     useEffect(() => {
         if (playedSong && playedSong.audioSrc && audioRef.current) {
             audioRef.current.onended = () => {
-                // nextSong();
+                nextSong();
             };
 
             audioRef.current.onloadeddata = () => {
@@ -61,28 +59,27 @@ export default function Player() {
                     volumeSet(audioRef.current?.volume ? audioRef.current?.volume : 0);
                 }
             };
-            audioRef.current.src = "data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV";
+
+            if (browser === 'Safari') {
+                audioRef.current.src = `https://193.77.22.228/song/${encodeURI(playedSong.file)}`;
+            } else {
+                audioRef.current.src = playedSong.audioSrc;
+            }
             setSongDuration(playedSong.duration)
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playedSong])
 
     const play = () => {
-        if (audioRef.current && playedSong?.audioSrc) {
-            audioRef.current.src = "https://193.77.22.228/song/Ava%20Max%20-%20Kings%20&%20Queens.mp3";
-        }
-        // audioRef.current?.play();
-        // playAnimationRef.current = requestAnimationFrame(repeat);
-        // setIsPlaying(true);
+        audioRef.current?.play();
+        playAnimationRef.current = requestAnimationFrame(repeat);
+        setIsPlaying(true);
     }
 
     const pause = () => {
-        if (audioRef.current && playedSong?.audioSrc) {
-            audioRef.current.src = playedSong.audioSrc;
-        }
-        // audioRef.current?.pause();
-        // setIsPlaying(false);
-        // cancelAnimationFrame(playAnimationRef.current);
+        audioRef.current?.pause();
+        setIsPlaying(false);
+        cancelAnimationFrame(playAnimationRef.current);
     }
 
     const repeatSong = () => {
@@ -160,7 +157,7 @@ export default function Player() {
                     <span className="text-xs text-white flex-1 flex justify-end">{parseSeconds(songDuration)}</span>
                 }
             </div>
-            <audio className="w-full" ref={audioRef} controls autoPlay={true} />
+            <audio className="w-full" ref={audioRef} autoPlay={true} />
         </div>
     )
 }
