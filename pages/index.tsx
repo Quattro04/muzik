@@ -43,7 +43,7 @@ export default function Home() {
                                 {playedSong?.index === idx && isPlaying &&
                                     <BarsAnimaiton className="mr-8" width={55} height={40} />
                                 }
-                                <span className="text-white flex-1 text-sm">{song.title}</span>
+                                <span className="text-white flex-1 text-xs sm:text-sm">{song.title}</span>
                                 <span className="text-white flex-1 text-sm opacity-80">{song.artist}</span>
                                 <span className="text-white text-sm opacity-80" style={{ flexBasis: '40px' }}>{song.releaseYear}</span>
                             </li>

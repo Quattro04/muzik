@@ -52,7 +52,11 @@ export default function Player() {
             };
 
             audioRef.current.onloadeddata = () => {
-                play();
+                if (!isIos || !firstTime) {
+                    playAnimationRef.current = requestAnimationFrame(repeat);
+                    setIsPlaying(true);
+                }
+                setFirstTime(false);
                 const localVol = localStorage.getItem('volume');
                 if (localVol) {
                     volumeSet(Number(localVol));
@@ -62,22 +66,7 @@ export default function Player() {
             };
 
             if (isIos) {
-                if (firstTime) {
-                    audioRef.current.src = "data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV";
-
-                    setTimeout(() => {
-                        if (audioRef.current) {
-                            audioRef.current.src = `https://193.77.22.228/song/${encodeURI(playedSong.file)}`;
-                        }
-                        pause();
-                        setTimeout(() => {
-                            play();
-                        }, 500);
-                    }, 500)
-                    setFirstTime(false);
-                } else {
-                    audioRef.current.src = `https://193.77.22.228/song/${encodeURI(playedSong.file)}`;
-                }
+                audioRef.current.src = `https://193.77.22.228/song/${encodeURI(playedSong.file)}`;
             } else {
                 audioRef.current.src = playedSong.audioSrc;
             }
