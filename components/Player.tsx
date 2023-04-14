@@ -46,10 +46,6 @@ export default function Player() {
                 console.log('ERORRRRORRRRR ');
                 console.log(e.target?.error.code);
             }, true);
-
-            audioRef.current.addEventListener('ended', () => {
-                nextSong();
-            });
         }
 
         return () => {
@@ -97,6 +93,12 @@ export default function Player() {
         // }
 
         if (playedSong && playedSong.file && audioRef.current) {
+            if (firstTime) {
+                audioRef.current.addEventListener('ended', () => {
+                    nextSong();
+                });
+                setFirstTime(false);
+            }
             // const newAudio = new Audio(playedSong.audioSrc);
             
             // newAudio.autoplay = true;
