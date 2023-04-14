@@ -113,7 +113,6 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
     }
 
     const playSong = (song: Song, callback?: () => void) => {
-        console.log('Playing: ', song)
         setPlayedSong(song);
         callback?.();
     }
