@@ -3,12 +3,14 @@ import { ReactNode, createContext, useContext, useEffect, useState } from "react
 interface InfoCtx {
     isIos: boolean;
     browser: string;
+    isMobile: boolean;
 };
 
 const InfoContext = createContext<InfoCtx>(
     {
         isIos: false,
-        browser: ''
+        browser: '',
+        isMobile: false
     }
 );
 
@@ -16,6 +18,7 @@ export function InfoContextProvider({ children }: { children: ReactNode }) {
 
     const [isIos, setIsIos] = useState<boolean>(false);
     const [browser, setBrowser] = useState<string>('');
+    const [isMobile, setIsMobile] = useState<boolean>(false);
 
     const iOS = () => {
         return [
@@ -47,13 +50,15 @@ export function InfoContextProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         setIsIos(iOS);
         setBrowser(getBrowser);
+        setIsMobile(window.innerWidth < 640);
     }, [])
 
     return (
         <InfoContext.Provider
             value={{
                 isIos,
-                browser
+                browser,
+                isMobile
             }}
         >
             {children}

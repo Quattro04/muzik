@@ -45,29 +45,28 @@ export default function Layout({ children }: { children: ReactNode }) {
 
     return (
         <>
-            <main className="flex flex-1 flex-col">
+            <main className="flex flex-1 flex-col h-full">
                 <header className="flex w-full">
                     <nav className="flex-1 border-gray-200 px-4 lg:px-6 py-2.5 bg-gray-800">
-                        <div className="flex flex-1 flex-wrap justify-between items-center mx-auto max-w-screen-xl">
+                        <div className="flex flex-1 justify-between items-center mx-auto max-w-screen-xl">
                             <Link href="/" className="flex items-center">
-                                <Image src="/logo.png" width="40" height="40" className="mr-6" alt="Muzik Logo" />
-                                <span className="self-center text-xl font-semibold whitespace-nowrap text-white">Muzik</span>
+                                <Image src="/logo.png" width="30" height="30" className="mr-6" alt="Muzik Logo" />
+                                <span className="hidden sm:block self-center text-xl font-semibold whitespace-nowrap text-white">Muzik</span>
                             </Link>
                             {canAdd &&
                                 <div className="flex items-center lg:order-2">
-                                    
                                         <form className="flex items-center" onSubmit={onSearchSubmit}>   
                                             <label className="sr-only">Search Youtube</label>
                                             <div className="relative w-full">
                                                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                                     <FontAwesomeIcon
                                                         icon={faSearch}
-                                                        style={{ fontSize: 16, color: "white" }}
+                                                        style={{ fontSize: 12, color: "white" }}
                                                     />
                                                 </div>
                                                 <input
                                                     type="text"
-                                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    className="text-xs sm:text-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full pl-8 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                                                     placeholder="Search Youtube"
                                                     value={searchQuery}
                                                     onChange={e => setSearchQuery(e.target.value)}
@@ -81,13 +80,13 @@ export default function Layout({ children }: { children: ReactNode }) {
                                         </form>
                                     <a
                                         href="#"
-                                        className="text-white font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 hover:bg-gray-700 focus:outline-none focus:ring-gray-800"
+                                        className="hidden sm:block text-white font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 hover:bg-gray-700 focus:outline-none focus:ring-gray-800"
                                     >
                                         Log in
                                     </a>
                                     <a
                                         href="#"
-                                        className="text-white font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 hover:bg-gray-700 focus:outline-none focus:ring-gray-800"
+                                        className="hidden sm:block text-white font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 hover:bg-gray-700 focus:outline-none focus:ring-gray-800"
                                         onClick={() => setUploadModalOpened(true)}
                                     >
                                         Upload

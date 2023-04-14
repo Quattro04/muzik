@@ -15,6 +15,7 @@ import { useInfo } from "@/context/InfoContext";
 export default function Player() {
 
     const audioRef = useRef<HTMLAudioElement>(null);
+    const [audio, setAudio] = useState<HTMLAudioElement>();
     // const [playing, setPlaying] = useState<boolean>(false);
     const [songVolume, setSongVolume] = useState<number>(0);
     const [songCurrentTime, setSongCurrentTime] = useState<number>(0);
@@ -46,32 +47,48 @@ export default function Player() {
     }, [])
 
     useEffect(() => {
-        if (playedSong && playedSong.audioSrc && audioRef.current) {
-            audioRef.current.onended = () => {
-                nextSong();
-            };
-
-            audioRef.current.onloadeddata = () => {
-                if (!isIos || !firstTime) {
-                    playAnimationRef.current = requestAnimationFrame(repeat);
-                    setIsPlaying(true);
-                }
-                setFirstTime(false);
-                const localVol = localStorage.getItem('volume');
-                if (localVol) {
-                    volumeSet(Number(localVol));
-                } else {
-                    volumeSet(audioRef.current?.volume ? audioRef.current?.volume : 0);
-                }
-            };
-
-            if (isIos) {
-                audioRef.current.src = `https://193.77.22.228/song/${encodeURI(playedSong.file)}`;
-            } else {
-                audioRef.current.src = playedSong.audioSrc;
-            }
-            setSongDuration(playedSong.duration)
+        if (audio && playedSong) {
+            playAnimationRef.current = requestAnimationFrame(repeat);
+            setIsPlaying(true);
+            setSongDuration(playedSong.duration);
         }
+    }, [audio])
+
+    useEffect(() => {
+        // if (playedSong && playedSong.audioSrc && audioRef.current) {
+        //     audioRef.current.onended = () => {
+        //         nextSong();
+        //     };
+
+        //     audioRef.current.onloadeddata = () => {
+        //         if (!isIos || !firstTime) {
+        //             playAnimationRef.current = requestAnimationFrame(repeat);
+        //             setIsPlaying(true);
+        //         }
+        //         setFirstTime(false);
+        //         const localVol = localStorage.getItem('volume');
+        //         if (localVol) {
+        //             volumeSet(Number(localVol));
+        //         } else {
+        //             volumeSet(audioRef.current?.volume ? audioRef.current?.volume : 0);
+        //         }
+        //     };
+
+        //     if (isIos) {
+        //         audioRef.current.src = `https://193.77.22.228/song/${encodeURI(playedSong.file)}`;
+        //     } else {
+        //         audioRef.current.src = playedSong.audioSrc;
+        //     }
+        //     setSongDuration(playedSong.duration)
+        // }
+
+        if (playedSong && playedSong.audioSrc) {
+            const newAudio = new Audio(playedSong.audioSrc);
+            newAudio.autoplay = true;
+            setAudio(newAudio);
+            // audio.play();
+        }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playedSong])
 
@@ -101,12 +118,13 @@ export default function Player() {
     }
 
     const repeat = useCallback(() => {
-        const currentTime = audioRef.current?.currentTime;
+        const currentTime = audio?.currentTime;
+
         if (currentTime) {
             setSongCurrentTime(currentTime);
         }      
         playAnimationRef.current = requestAnimationFrame(repeat);
-    }, []);
+    }, [audio]);
 
     const parseSeconds = (s: number): string => {
         const seconds = Math.round(s);
@@ -162,7 +180,7 @@ export default function Player() {
                     <span className="text-xs text-white flex-1 flex justify-end">{parseSeconds(songDuration)}</span>
                 }
             </div>
-            <audio className="w-full" ref={audioRef} autoPlay={true} />
+            {/* <audio className="w-full" ref={audioRef} autoPlay={true} /> */}
         </div>
     )
 }

@@ -4,7 +4,7 @@ interface SongsCtx {
     songs: Song[];
     fetchSongs: (callback?: () => void) => Promise<void>;
     playedSong: PlayedSong | undefined;
-    playSong: (_: Song, idx: number) => void;
+    playSong: (_: Song, idx: number, callback?: () => void) => void;
     isPlaying: boolean;
     setIsPlaying: (_: boolean) => void;
     nextSong: () => void;
@@ -59,7 +59,7 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
         callback?.();
     }
 
-    const fetchSong = (song: Song, idx: number) => {
+    const fetchSong = (song: Song, idx: number, callback?: () => void) => {
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/song/${song.file}`, {
             headers: {
                 'Authentication': process.env.NEXT_PUBLIC_AUTH_TOKEN as string
@@ -92,6 +92,7 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
                 audioSrc: url,
                 index: idx
             })
+            callback?.();
         })
         .catch((err) => console.error(err));
     }
