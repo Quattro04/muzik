@@ -9,7 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { PlayedSong, useSongs } from '@/context/SongsContext';
+import { useSongs } from '@/context/SongsContext';
 import Player from './Player';
 
 export default function Layout({ children }: { children: ReactNode }) {

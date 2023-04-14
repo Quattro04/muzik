@@ -3,7 +3,7 @@ import React, { useContext, useState, useEffect, createContext, ReactNode } from
 interface SongsCtx {
     songs: Song[];
     fetchSongs: (callback?: () => void) => Promise<void>;
-    playedSong: PlayedSong | undefined;
+    playedSong: Song | undefined;
     playSong: (_: Song, idx: number, callback?: () => void) => void;
     isPlaying: boolean;
     setIsPlaying: (_: boolean) => void;
@@ -37,15 +37,15 @@ export interface Song {
     createdAt: string;
 }
 
-export interface PlayedSong extends Song {
-    audioSrc: string | undefined;
-    index: number;
-}
+// export interface PlayedSong extends Song {
+//     audioSrc: string | undefined;
+//     index: number;
+// }
 
 export function SongsContextProvider({ children }: { children: ReactNode }) {
 
     const [songs, setSongs] = useState<Song[]>([]);
-    const [playedSong, setPlayedSong] = useState<PlayedSong | undefined>(undefined);
+    const [playedSong, setPlayedSong] = useState<Song | undefined>(undefined);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
     const fetchData = async (callback?: () => void) => {
@@ -59,60 +59,65 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
         callback?.();
     }
 
-    const fetchSong = (song: Song, idx: number, callback?: () => void) => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/song/${song.file}`, {
-            headers: {
-                'Authentication': process.env.NEXT_PUBLIC_AUTH_TOKEN as string
-            }
-        })
-        .then((response) => {
-            const reader = response.body?.getReader();
-            return new ReadableStream({
-            start(controller) {
-                const pump = (): any => {
-                    return reader?.read().then(({ done, value }) => {
-                        if (done) {
-                            controller.close();
-                            return;
-                        }
-                        controller.enqueue(value);
-                        return pump();
-                    });
-                }
-                return pump();
-            },
-            });
-        })
-        .then((stream) => new Response(stream))
-        .then((response) => response.blob())
-        .then((blob) => URL.createObjectURL(blob))
-        .then((url) => {
-            setPlayedSong({
-                ...song,
-                audioSrc: url,
-                index: idx
-            })
-            callback?.();
-        })
-        .catch((err) => console.error(err));
-    }
+    // const fetchSong = (song: Song, idx: number, callback?: () => void) => {
+    //     fetch(`${process.env.NEXT_PUBLIC_API_URL}/song/${song.file}`, {
+    //         headers: {
+    //             'Authentication': process.env.NEXT_PUBLIC_AUTH_TOKEN as string
+    //         }
+    //     })
+    //     .then((response) => {
+    //         const reader = response.body?.getReader();
+    //         return new ReadableStream({
+    //         start(controller) {
+    //             const pump = (): any => {
+    //                 return reader?.read().then(({ done, value }) => {
+    //                     if (done) {
+    //                         controller.close();
+    //                         return;
+    //                     }
+    //                     controller.enqueue(value);
+    //                     return pump();
+    //                 });
+    //             }
+    //             return pump();
+    //         },
+    //         });
+    //     })
+    //     .then((stream) => new Response(stream))
+    //     .then((response) => response.blob())
+    //     .then((blob) => URL.createObjectURL(blob))
+    //     .then((url) => {
+    //         setPlayedSong({
+    //             ...song,
+    //             audioSrc: url,
+    //             index: idx
+    //         })
+    //         callback?.();
+    //     })
+    //     .catch((err) => console.error(err));
+    // }
 
     const nextSong = () => {
-        const randomSong = Math.floor(Math.random() * songs.length);
-        fetchSong(songs[randomSong], randomSong);
+        // const randomSong = Math.floor(Math.random() * songs.length);
+        // fetchSong(songs[randomSong], randomSong);
     }
 
     const repeatSong = () => {
-        const currSong = songs.find(s => s.file === playedSong?.file);
-        if (currSong) {
-            const idx = songs.findIndex(s => s === currSong);
-            fetchSong(currSong, idx);
-        }
+        // const currSong = songs.find(s => s.file === playedSong?.file);
+        // if (currSong) {
+            // const idx = songs.findIndex(s => s === currSong);
+            // fetchSong(currSong, idx);
+        // }
     }
 
     const stop = () => {
         setPlayedSong(undefined);
         setIsPlaying(false);
+    }
+
+    const playSong = (song: Song, idx: number, callback?: () => void) => {
+        setPlayedSong(song);
+        callback?.();
     }
 
     // useEffect(() => {
@@ -126,7 +131,7 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
                 songs,
                 fetchSongs: fetchData,
                 playedSong,
-                playSong: fetchSong,
+                playSong,
                 isPlaying,
                 setIsPlaying,
                 nextSong,

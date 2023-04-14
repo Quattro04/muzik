@@ -92,14 +92,14 @@ export default function Player() {
         //     setSongDuration(playedSong.duration)
         // }
 
-        if (playedSong && playedSong.audioSrc && audioRef.current) {
+        if (playedSong && playedSong.file && audioRef.current) {
             // const newAudio = new Audio(playedSong.audioSrc);
             
             // newAudio.autoplay = true;
             // setAudio(newAudio);
             // audio.play();
             console.log('da')
-            setAudioSrc(playedSong.audioSrc)
+            setAudioSrc(`https://193.77.22.228/song/${encodeURI(playedSong.file)}`)
             // audioRef.current.play()
         }
 
