@@ -48,7 +48,7 @@ export default function Player() {
 
     useEffect(() => {
         if (audio && playedSong) {
-            if (!isIos) {
+            if (browser !== 'Safari' && !isIos) {
                 playAnimationRef.current = requestAnimationFrame(repeat);
                 setIsPlaying(true);
             }
