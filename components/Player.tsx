@@ -48,8 +48,10 @@ export default function Player() {
 
     useEffect(() => {
         if (audio && playedSong) {
-            playAnimationRef.current = requestAnimationFrame(repeat);
-            setIsPlaying(true);
+            if (!isIos) {
+                playAnimationRef.current = requestAnimationFrame(repeat);
+                setIsPlaying(true);
+            }
             setSongDuration(playedSong.duration);
         }
     }, [audio])
@@ -93,27 +95,27 @@ export default function Player() {
     }, [playedSong])
 
     const play = () => {
-        audioRef.current?.play();
+        audio?.play();
         playAnimationRef.current = requestAnimationFrame(repeat);
         setIsPlaying(true);
     }
 
     const pause = () => {
-        audioRef.current?.pause();
+        audio?.pause();
         setIsPlaying(false);
         cancelAnimationFrame(playAnimationRef.current);
     }
 
     const repeatSong = () => {
-        if (audioRef.current) {
-            audioRef.current.currentTime = 0;
+        if (audio) {
+            audio.currentTime = 0;
         }
     }
 
     const timeSkip = (event: any) => {
         const ratio = event.pageX / window.innerWidth;
-        if (audioRef.current) {
-            audioRef.current.currentTime = Math.round(songDuration * ratio);
+        if (audio) {
+            audio.currentTime = Math.round(songDuration * ratio);
         }
     }
 
@@ -135,8 +137,8 @@ export default function Player() {
     }
 
     const volumeSet = (volume: number) => {
-        if (audioRef.current === null) return;
-        audioRef.current.volume = volume;
+        if (audio === undefined) return;
+        audio.volume = volume;
         localStorage.setItem('volume', volume.toString())
         setSongVolume(volume);
     }
