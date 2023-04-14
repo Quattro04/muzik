@@ -90,6 +90,9 @@ export default function Player() {
                 audioRef.current.addEventListener('error', function(e: any) {
                     console.log('ERORRRRORRRRR ');
                     console.log(e.target?.error.code);
+                    setTimeout(() => {
+                        nextSong();
+                    }, 5000)
                 }, true);
 
                 audioRef.current.addEventListener('ended', () => {
