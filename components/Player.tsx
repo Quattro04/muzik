@@ -98,7 +98,6 @@ export default function Player() {
             // newAudio.autoplay = true;
             // setAudio(newAudio);
             // audio.play();
-            console.log('da')
             setAudioSrc(`https://193.77.22.228/song/${encodeURI(playedSong.file)}`)
             // audioRef.current.play()
         }
@@ -194,7 +193,7 @@ export default function Player() {
                     <span className="text-xs text-white flex-1 flex justify-end">{parseSeconds(songDuration)}</span>
                 }
             </div> */}
-            <video className="w-full h-16" ref={audioRef} src={audioSrc} autoPlay controls />
+            <audio className="w-full h-16" ref={audioRef} src={audioSrc} autoPlay controls />
         </div>
     )
 }
