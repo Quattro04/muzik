@@ -29,10 +29,10 @@ export default function Player() {
 
     useEffect(() => {
         navigator.mediaSession.setActionHandler('play', function() {
-            play();
+            // play();
         });
         navigator.mediaSession.setActionHandler('pause', function() {
-            pause();
+            // pause();
         });
         navigator.mediaSession.setActionHandler('previoustrack', function() {
             repeatSong();
@@ -109,17 +109,17 @@ export default function Player() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playedSong])
 
-    const play = () => {
-        audio?.play();
-        playAnimationRef.current = requestAnimationFrame(repeat);
-        setIsPlaying(true);
-    }
+    // const play = () => {
+    //     audio?.play();
+    //     playAnimationRef.current = requestAnimationFrame(repeat);
+    //     setIsPlaying(true);
+    // }
 
-    const pause = () => {
-        audio?.pause();
-        setIsPlaying(false);
-        cancelAnimationFrame(playAnimationRef.current);
-    }
+    // const pause = () => {
+    //     audio?.pause();
+    //     setIsPlaying(false);
+    //     cancelAnimationFrame(playAnimationRef.current);
+    // }
 
     const repeatSong = () => {
         if (audio) {
@@ -127,21 +127,21 @@ export default function Player() {
         }
     }
 
-    const timeSkip = (event: any) => {
-        const ratio = event.pageX / window.innerWidth;
-        if (audio) {
-            audio.currentTime = Math.round(songDuration * ratio);
-        }
-    }
+    // const timeSkip = (event: any) => {
+    //     const ratio = event.pageX / window.innerWidth;
+    //     if (audio) {
+    //         audio.currentTime = Math.round(songDuration * ratio);
+    //     }
+    // }
 
-    const repeat = useCallback(() => {
-        const currentTime = audio?.currentTime;
+    // const repeat = useCallback(() => {
+    //     const currentTime = audio?.currentTime;
 
-        if (currentTime) {
-            setSongCurrentTime(currentTime);
-        }      
-        playAnimationRef.current = requestAnimationFrame(repeat);
-    }, [audio]);
+    //     if (currentTime) {
+    //         setSongCurrentTime(currentTime);
+    //     }      
+    //     playAnimationRef.current = requestAnimationFrame(repeat);
+    // }, [audio]);
 
     const parseSeconds = (s: number): string => {
         const seconds = Math.round(s);
@@ -160,7 +160,7 @@ export default function Player() {
 
     return (
         <div className="flex flex-1 justify-center align-center p-3 border-lightblue border-t-2">
-            <div
+            {/* <div
                 className="absolute bg-green left-0 index-10"
                 style={{ width: `${(songCurrentTime / songDuration) * 100}%`, height: '2px', marginTop: -14 }}
             />
@@ -168,7 +168,7 @@ export default function Player() {
                 className="absolute left-0 index-20 w-full cursor-pointer"
                 style={{ height: '20px', marginTop: -24 }}
                 onMouseUp={timeSkip}
-            />
+            /> */}
             {/* <div className="flex items-center justify-center w-full">
                 {playedSong &&
                     <span className="text-xs text-green flex-1">{parseSeconds(songCurrentTime)}</span>
