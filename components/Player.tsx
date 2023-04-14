@@ -16,6 +16,7 @@ export default function Player() {
 
     const audioRef = useRef<HTMLAudioElement>(null);
     const [audio, setAudio] = useState<HTMLAudioElement>();
+    const [audioSrc, setAudioSrc] = useState<string>("");
     // const [playing, setPlaying] = useState<boolean>(false);
     const [songVolume, setSongVolume] = useState<number>(0);
     const [songCurrentTime, setSongCurrentTime] = useState<number>(0);
@@ -40,21 +41,28 @@ export default function Player() {
             nextSong();
         });
 
+        if (audioRef.current) {
+            audioRef.current.addEventListener('error', function(e) {
+                console.log('ERORRRRORRRRR ');
+                console.log(e);
+            }, true);
+        }
+
         return () => {
             stop();
             cancelAnimationFrame(playAnimationRef.current);
         }
     }, [])
 
-    useEffect(() => {
-        if (audio && playedSong) {
-            if (browser !== 'Safari' && !isIos) {
-                playAnimationRef.current = requestAnimationFrame(repeat);
-                setIsPlaying(true);
-            }
-            setSongDuration(playedSong.duration);
-        }
-    }, [audio])
+    // useEffect(() => {
+    //     if (audio && playedSong) {
+    //         if (browser !== 'Safari' && !isIos) {
+    //             playAnimationRef.current = requestAnimationFrame(repeat);
+    //             setIsPlaying(true);
+    //         }
+    //         setSongDuration(playedSong.duration);
+    //     }
+    // }, [audio])
 
     useEffect(() => {
         // if (playedSong && playedSong.audioSrc && audioRef.current) {
@@ -84,15 +92,15 @@ export default function Player() {
         //     setSongDuration(playedSong.duration)
         // }
 
-        if (playedSong && playedSong.audioSrc) {
-            const newAudio = new Audio(playedSong.audioSrc);
-            newAudio.addEventListener('error', function(e) {
-                console.log('ERORRRRORRRRR ');
-                console.log(e);
-            }, true);
-            newAudio.autoplay = true;
-            setAudio(newAudio);
+        if (playedSong && playedSong.audioSrc && audioRef.current) {
+            // const newAudio = new Audio(playedSong.audioSrc);
+            
+            // newAudio.autoplay = true;
+            // setAudio(newAudio);
             // audio.play();
+            console.log('da')
+            setAudioSrc(playedSong.audioSrc)
+            // audioRef.current.play()
         }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -158,7 +166,7 @@ export default function Player() {
                 style={{ height: '20px', marginTop: -24 }}
                 onMouseUp={timeSkip}
             />
-            <div className="flex items-center justify-center w-full">
+            {/* <div className="flex items-center justify-center w-full">
                 {playedSong &&
                     <span className="text-xs text-green flex-1">{parseSeconds(songCurrentTime)}</span>
                 }
@@ -185,8 +193,8 @@ export default function Player() {
                 {playedSong &&
                     <span className="text-xs text-white flex-1 flex justify-end">{parseSeconds(songDuration)}</span>
                 }
-            </div>
-            {/* <audio className="w-full" ref={audioRef} autoPlay={true} /> */}
+            </div> */}
+            <audio className="w-full" ref={audioRef} src={audioSrc} autoPlay controls muted />
         </div>
     )
 }
