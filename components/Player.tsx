@@ -28,29 +28,9 @@ export default function Player() {
     const [firstTime, setFirstTime] = useState<boolean>(true);
 
     useEffect(() => {
-        navigator.mediaSession.setActionHandler('play', function() {
-            // play();
-        });
-        navigator.mediaSession.setActionHandler('pause', function() {
-            // pause();
-        });
-        navigator.mediaSession.setActionHandler('previoustrack', function() {
-            repeatSong();
-        });
-        navigator.mediaSession.setActionHandler('nexttrack', function() {
-            nextSong();
-        });
-
-        if (audioRef.current) {
-            audioRef.current.addEventListener('error', function(e: any) {
-                console.log('ERORRRRORRRRR ');
-                console.log(e.target?.error.code);
-            }, true);
-        }
-
         return () => {
-            stop();
-            cancelAnimationFrame(playAnimationRef.current);
+            // stop();
+            // cancelAnimationFrame(playAnimationRef.current);
         }
     }, [])
 
@@ -94,6 +74,24 @@ export default function Player() {
 
         if (playedSong && playedSong.file && audioRef.current) {
             if (firstTime) {
+                navigator.mediaSession.setActionHandler('play', function() {
+                    play();
+                });
+                navigator.mediaSession.setActionHandler('pause', function() {
+                    pause();
+                });
+                navigator.mediaSession.setActionHandler('previoustrack', function() {
+                    repeatSong();
+                });
+                navigator.mediaSession.setActionHandler('nexttrack', function() {
+                    nextSong();
+                });
+
+                audioRef.current.addEventListener('error', function(e: any) {
+                    console.log('ERORRRRORRRRR ');
+                    console.log(e.target?.error.code);
+                }, true);
+
                 audioRef.current.addEventListener('ended', () => {
                     nextSong();
                 });
@@ -111,21 +109,21 @@ export default function Player() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playedSong])
 
-    // const play = () => {
-    //     audio?.play();
-    //     playAnimationRef.current = requestAnimationFrame(repeat);
-    //     setIsPlaying(true);
-    // }
+    const play = () => {
+        audioRef.current?.play();
+        // playAnimationRef.current = requestAnimationFrame(repeat);
+        // setIsPlaying(true);
+    }
 
-    // const pause = () => {
-    //     audio?.pause();
-    //     setIsPlaying(false);
-    //     cancelAnimationFrame(playAnimationRef.current);
-    // }
+    const pause = () => {
+        audioRef.current?.pause();
+        // setIsPlaying(false);
+        // cancelAnimationFrame(playAnimationRef.current);
+    }
 
     const repeatSong = () => {
-        if (audio) {
-            audio.currentTime = 0;
+        if (audioRef.current) {
+            audioRef.current.currentTime = 0;
         }
     }
 
@@ -153,15 +151,8 @@ export default function Player() {
         return `${minutes}:${secondsLeftString}`;
     }
 
-    const volumeSet = (volume: number) => {
-        if (audio === undefined) return;
-        audio.volume = volume;
-        localStorage.setItem('volume', volume.toString())
-        setSongVolume(volume);
-    }
-
     return (
-        <div className="flex flex-1 justify-center align-center p-3 border-lightblue border-t-2">
+        <div className="flex flex-1 justify-center items-center p-3 border-lightblue border-t-2">
             {/* <div
                 className="absolute bg-green left-0 index-10"
                 style={{ width: `${(songCurrentTime / songDuration) * 100}%`, height: '2px', marginTop: -14 }}
@@ -200,6 +191,11 @@ export default function Player() {
                 }
             </div> */}
             <audio className="w-full" ref={audioRef} src={audioSrc} autoPlay controls />
+            <FontAwesomeIcon
+                icon={faForward}
+                style={{ fontSize: 16, color: "white", padding: '10px 15px', cursor: 'pointer' }}
+                onClick={() => nextSong()}
+            />
         </div>
     )
 }
