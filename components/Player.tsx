@@ -14,7 +14,7 @@ import { useInfo } from "@/context/InfoContext";
 
 export default function Player() {
 
-    const audioRef = useRef<HTMLAudioElement>(null);
+    const audioRef = useRef<HTMLVideoElement>(null);
     const [audio, setAudio] = useState<HTMLAudioElement>();
     const [audioSrc, setAudioSrc] = useState<string>("");
     // const [playing, setPlaying] = useState<boolean>(false);
@@ -42,9 +42,9 @@ export default function Player() {
         });
 
         if (audioRef.current) {
-            audioRef.current.addEventListener('error', function(e) {
+            audioRef.current.addEventListener('error', function(e: any) {
                 console.log('ERORRRRORRRRR ');
-                console.log(e);
+                console.log(e.target?.error.code);
             }, true);
         }
 
@@ -194,7 +194,7 @@ export default function Player() {
                     <span className="text-xs text-white flex-1 flex justify-end">{parseSeconds(songDuration)}</span>
                 }
             </div> */}
-            <audio className="w-full" ref={audioRef} src={audioSrc} autoPlay controls muted />
+            <video className="w-full h-16" ref={audioRef} src={audioSrc} autoPlay controls type="audio/mpeg" />
         </div>
     )
 }
