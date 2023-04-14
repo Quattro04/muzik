@@ -45,14 +45,14 @@ export default function Home() {
                         {songs.map((song, idx) =>
                             <li
                                 key={idx}
-                                className={`relative basis-12 flex items-center flex-1 pr-4 cursor-pointer rounded ${songLoading === idx || playedSong?.index === idx ? 'bg-lightblue' : ''}`}
+                                className={`relative basis-12 flex items-center flex-1 pr-4 cursor-pointer rounded ${songLoading === idx || playedSong?.duration === idx ? 'bg-lightblue' : ''}`}
                                 style={{ paddingLeft: songLoading === idx ? (isMobile ? '71px' : '87px') : '0' }}
                                 onClick={() => onPlaySong(song, idx)}
                             >
-                                {songLoading !== idx && (playedSong?.index !== idx || !isPlaying) &&
+                                {songLoading !== idx && (playedSong?.duration !== idx || !isPlaying) &&
                                     <img className="mr-4 sm:mr-8 rounded" src={song.image} width={55} height={40} alt="Art cover" />
                                 }
-                                {songLoading !== idx && playedSong?.index === idx && isPlaying &&
+                                {songLoading !== idx && playedSong?.duration === idx && isPlaying &&
                                     <BarsAnimaiton className="mr-4 sm:mr-8" width={55} height={40} />
                                 }
                                 <span className="text-white flex-1 text-xs sm:text-sm mr-4">{song.title}</span>

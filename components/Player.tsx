@@ -194,7 +194,7 @@ export default function Player() {
                     <span className="text-xs text-white flex-1 flex justify-end">{parseSeconds(songDuration)}</span>
                 }
             </div> */}
-            <video className="w-full h-16" ref={audioRef} src={audioSrc} autoPlay controls type="audio/mpeg" />
+            <video className="w-full h-16" ref={audioRef} src={audioSrc} autoPlay controls />
         </div>
     )
 }
