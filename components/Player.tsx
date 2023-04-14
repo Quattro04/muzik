@@ -86,6 +86,10 @@ export default function Player() {
 
         if (playedSong && playedSong.audioSrc) {
             const newAudio = new Audio(playedSong.audioSrc);
+            newAudio.addEventListener('error', function(e) {
+                console.log('ERORRRRORRRRR ');
+                console.log(e);
+            }, true);
             newAudio.autoplay = true;
             setAudio(newAudio);
             // audio.play();
