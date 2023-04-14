@@ -26,15 +26,20 @@ export default function Home() {
 
     const onPlaySong = (song: Song, index: number) => {
         setSongLoading(index);
-        playSong(song, index, () => {
+        playSong(song, () => {
             setSongLoading(-1);
         })
+    }
+
+    const getIndex = (song: Song | undefined) => {
+        if (!song) return -1;
+        return songs.findIndex(s => s === song);
     }
 
     return (
         <>
             <Head>
-                <title>Muzik</title>
+                <title>{`${playedSong?.title} - ${playedSong?.artist}`}</title>
                 <meta name="description" content="Personal muzik storage and player" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
@@ -45,14 +50,14 @@ export default function Home() {
                         {songs.map((song, idx) =>
                             <li
                                 key={idx}
-                                className={`relative basis-12 flex items-center flex-1 pr-4 cursor-pointer rounded ${songLoading === idx || playedSong?.duration === idx ? 'bg-lightblue' : ''}`}
+                                className={`relative basis-12 flex items-center flex-1 pr-4 cursor-pointer rounded ${songLoading === idx || getIndex(playedSong) === idx ? 'bg-lightblue' : ''}`}
                                 style={{ paddingLeft: songLoading === idx ? (isMobile ? '71px' : '87px') : '0' }}
                                 onClick={() => onPlaySong(song, idx)}
                             >
-                                {songLoading !== idx && (playedSong?.duration !== idx || !isPlaying) &&
+                                {songLoading !== idx && (getIndex(playedSong) !== idx || !isPlaying) &&
                                     <img className="mr-4 sm:mr-8 rounded" src={song.image} width={55} height={40} alt="Art cover" />
                                 }
-                                {songLoading !== idx && playedSong?.duration === idx && isPlaying &&
+                                {songLoading !== idx && getIndex(playedSong) === idx && isPlaying &&
                                     <BarsAnimaiton className="mr-4 sm:mr-8" width={55} height={40} />
                                 }
                                 <span className="text-white flex-1 text-xs sm:text-sm mr-4">{song.title}</span>

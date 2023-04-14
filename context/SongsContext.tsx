@@ -4,7 +4,7 @@ interface SongsCtx {
     songs: Song[];
     fetchSongs: (callback?: () => void) => Promise<void>;
     playedSong: Song | undefined;
-    playSong: (_: Song, idx: number, callback?: () => void) => void;
+    playSong: (_: Song, callback?: () => void) => void;
     isPlaying: boolean;
     setIsPlaying: (_: boolean) => void;
     nextSong: () => void;
@@ -49,11 +49,7 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
     const fetchData = async (callback?: () => void) => {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/songs`, {
-        headers: {
-            'Authentication': process.env.NEXT_PUBLIC_AUTH_TOKEN as string
-            }
-        });
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/songs`);
         const songsRes = await res.json();
         setSongs(songsRes.data);
         callback?.();
@@ -98,7 +94,8 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
     // }
 
     const nextSong = () => {
-        // const randomSong = Math.floor(Math.random() * songs.length);
+        const randomSong = Math.floor(Math.random() * songs.length);
+        playSong(songs[randomSong]);
         // fetchSong(songs[randomSong], randomSong);
     }
 
@@ -115,7 +112,7 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
         setIsPlaying(false);
     }
 
-    const playSong = (song: Song, idx: number, callback?: () => void) => {
+    const playSong = (song: Song, callback?: () => void) => {
         setPlayedSong(song);
         callback?.();
     }
