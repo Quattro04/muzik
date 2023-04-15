@@ -1,3 +1,4 @@
+import { useApi } from "@/hooks/useApi";
 import React, { useContext, useState, useEffect, createContext, ReactNode } from "react";
 
 interface SongsCtx {
@@ -43,10 +44,18 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
     const [playedSong, setPlayedSong] = useState<Song | undefined>(undefined);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
+    const { getSongs } = useApi();
+
+
     const fetchData = async (callback?: () => void) => {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/songs`);
-        const songsRes = await res.json();
-        setSongs(songsRes.data);
+        
+        const songs = await getSongs();
+
+        if (songs.error) {
+            alert(songs.error.message);
+        }
+
+        setSongs(songs);
         callback?.();
     }
 

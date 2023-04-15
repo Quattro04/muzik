@@ -6,14 +6,26 @@ export function useApi() {
 
     const { user } = useUser();
 
+    const getSongs = async () => {
+
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/songs`);
+            if (res.status !== 200) {
+                throw new Error('Error fetching songs: ' + res.status);
+            }
+            const songsRes = await res.json();
+            return songsRes.data;
+        } catch(e: any) {
+            return { error: e };
+        }
+    }
+
     const addUserToSong = async (song: Song) => {
 
         if (user && song.users.includes(user)) {
             alert('You already have this song in your library!')
             return {};
         }
-
-        console.log('ne')
 
         const body = {
             id: song.id,
@@ -71,6 +83,7 @@ export function useApi() {
     }
 
     return {
+        getSongs,
         addUserToSong,
         addSongFromYt,
         getYtVideos
