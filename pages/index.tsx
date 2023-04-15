@@ -64,9 +64,9 @@ export default function Home() {
                                 {songLoading !== idx && (getIndex(playedSong) !== idx || !isPlaying) &&
                                     <img className="mr-4 sm:mr-8 rounded" src={song.image} width={55} height={40} alt="Art cover" />
                                 }
-                                <span className="text-white flex-1 text-xs sm:text-sm mr-4">{song.title}</span>
-                                <span className="text-white flex-1 text-xs sm:text-sm opacity-80 mr-4">{song.artist}</span>
-                                <span className="text-white text-xs sm:text-sm opacity-80" style={{ flexBasis: '40px' }}>{song.releaseYear}</span>
+                                <span className="text-white flex-1 text-xs sm:text-sm mr-4 pointer-events-none">{song.title}</span>
+                                <span className="text-white flex-1 text-xs sm:text-sm opacity-80 mr-4 pointer-events-none">{song.artist}</span>
+                                <span className="text-white text-xs sm:text-sm opacity-80 pointer-events-none" style={{ flexBasis: '40px' }}>{song.releaseYear}</span>
                                 {songLoading === idx &&
                                     <div className="flex items-center absolute left-0 top-0 w-full h-full pl-3">
                                         <LoadingSpinner width={30} height={30} />
