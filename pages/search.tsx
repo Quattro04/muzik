@@ -68,7 +68,11 @@ export default function Search() {
     }
 
     const onYtModalSuccess = (res: any) => {
-        toast.success(res.message);
+        if (res.message) {
+            toast.success(res.message);
+        } else if (res.error) {
+            toast.error(res.error);
+        }
         setYtModalOpened(false);
     }
 
@@ -90,6 +94,16 @@ export default function Search() {
 
     const compareToQuery = (file: string) => {
         return query ? file.toLowerCase().includes(decodeURI(query).toLowerCase()) : false;
+
+        // if (!query) return false;
+        // const q = decodeURI(query);
+        // const arr = q.split(' ')
+        // for (let i = 0; i < arr.length; i++) {
+        //     if (file.toLowerCase().includes(arr[i].toLowerCase())) {
+        //         return true;
+        //     }
+        // }
+        // return false;
     }
 
     const addFromServer = async (song: Song) => {
@@ -115,30 +129,32 @@ export default function Search() {
                     >
                         Back to library
                     </Link>
-                    <div className="flex flex-col w-full mb-4">
-                        <h2 className="text-white text-lg mb-3">On server:</h2>
-                        <ul className="flex w-full flex-col mb-auto divide-y divide-lightblue mx-auto max-w-screen-xl">
-                            {songs.filter(s => compareToQuery(s.file)).map(song =>
-                                <li
-                                    key={song.id}
-                                    className="relative basis-12 flex items-center flex-1 pr-4 rounded"
-                                >
-                                    <img className="mr-4 sm:mr-8 rounded" src={song.image} width={55} height={40} alt="Art cover" />
-                                    <span className="text-white flex-1 text-xs sm:text-sm mr-4">{song.title}</span>
-                                    <span className="text-white flex-1 text-xs sm:text-sm opacity-80 mr-4">{song.artist}</span>
-                                    <span className="text-white text-xs sm:text-sm opacity-80 mr-4">
-                                        By: {song.users}
-                                    </span>
-                                    <button
-                                        className="text-white bg-lightblue font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 hover:bg-gray-700 focus:outline-none focus:ring-gray-800"
-                                        onClick={() => addFromServer(song)}
+                    {songs.filter(s => compareToQuery(s.file)).length > 0 &&
+                        <div className="flex flex-col w-full mb-4">
+                            <h2 className="text-white text-lg mb-3">On server:</h2>
+                            <ul className="flex w-full flex-col mb-auto divide-y divide-lightblue mx-auto max-w-screen-xl">
+                                {songs.filter(s => compareToQuery(s.file)).map(song =>
+                                    <li
+                                        key={song.id}
+                                        className="relative basis-12 flex items-center flex-1 pr-4 rounded"
                                     >
-                                        Add
-                                    </button>
-                                </li>
-                            )}
-                        </ul>
-                    </div>
+                                        <img className="mr-4 sm:mr-8 rounded" src={song.image} width={55} height={40} alt="Art cover" />
+                                        <span className="text-white flex-1 text-xs sm:text-sm mr-4">{song.title}</span>
+                                        <span className="text-white flex-1 text-xs sm:text-sm opacity-80 mr-4">{song.artist}</span>
+                                        <span className="text-white text-xs sm:text-sm opacity-80 mr-4">
+                                            By: {song.users}
+                                        </span>
+                                        <button
+                                            className="text-white bg-lightblue font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 hover:bg-gray-700 focus:outline-none focus:ring-gray-800"
+                                            onClick={() => addFromServer(song)}
+                                        >
+                                            Add
+                                        </button>
+                                    </li>
+                                )}
+                            </ul>
+                        </div>
+                    }
                     <div className="flex flex-col">
                         <h2 className="text-white text-lg mb-3">On Youtube:</h2>
                         {loading &&

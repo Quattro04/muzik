@@ -17,16 +17,6 @@ export default function Player() {
     useEffect(() => {
         if (playedSong && playedSong.file && audioRef.current) {
             if (firstTime) {
-
-                const metadata = new MediaMetadata({
-                    title: playedSong.title,
-                    artist: playedSong.artist,
-                    album: "",
-                    artwork: [{ src: playedSong.image, sizes: "1280x720", type: "image/jpeg" }]
-                });
-                  
-                navigator.mediaSession.metadata = metadata;
-
                 navigator.mediaSession.setActionHandler('play', function() {
                     play();
                 });
@@ -53,6 +43,16 @@ export default function Player() {
                 });
                 setFirstTime(false);
             }
+
+            const metadata = new MediaMetadata({
+                title: playedSong.title,
+                artist: playedSong.artist,
+                album: "",
+                artwork: [{ src: playedSong.image, sizes: "1280x720", type: "image/jpeg" }]
+            });
+              
+            navigator.mediaSession.metadata = metadata;
+
             setAudioSrc(`https://193.77.22.228/song/${encodeURI(playedSong.file)}`)
         }
 
