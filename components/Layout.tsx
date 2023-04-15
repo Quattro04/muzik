@@ -11,6 +11,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSongs } from '@/context/SongsContext';
 import Player from './Player';
+import { useUser } from '@/context/UserContext';
 
 export default function Layout({ children }: { children: ReactNode }) {
 
@@ -19,7 +20,8 @@ export default function Layout({ children }: { children: ReactNode }) {
     const [uploadModalOpened, setUploadModalOpened] = useState<boolean>(false);
     const [canAdd, setCanAdd] = useState<boolean>(false);
 
-    const { playedSong, songs, fetchSongs } = useSongs();
+    const { fetchSongs } = useSongs();
+    const { user } = useUser();
 
     const onSearchSubmit = (e: FormEvent) => {
         router.push(`/search?q=${searchQuery}`);
@@ -37,11 +39,10 @@ export default function Layout({ children }: { children: ReactNode }) {
     }
 
     useEffect(() => {
-        const check = localStorage.getItem('addKey');
-        if (check === process.env.NEXT_PUBLIC_AUTH_TOKEN) {
+        if (user === 'matija' || user === 'mojca') {
             setCanAdd(true);
         }
-    }, [])
+    }, [user])
 
     return (
         <>
@@ -73,12 +74,8 @@ export default function Layout({ children }: { children: ReactNode }) {
                                                     required
                                                 />
                                             </div>
-                                            {/* <button type="submit" className="p-2.5 ml-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                                <span className="sr-only">Search</span>
-                                            </button> */}
                                         </form>
-                                    <a
+                                    {/* <a
                                         href="#"
                                         className="hidden sm:block text-white font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 hover:bg-gray-700 focus:outline-none focus:ring-gray-800"
                                     >
@@ -90,7 +87,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                                         onClick={() => setUploadModalOpened(true)}
                                     >
                                         Upload
-                                    </a>
+                                    </a> */}
                                 </div>
                             }
                         </div>
@@ -98,9 +95,6 @@ export default function Layout({ children }: { children: ReactNode }) {
                 </header>
                 <div className="flex flex-1 w-full flex-col bg-darkblue overflow-auto pb-20">
                     {children}
-                </div>
-                <div className="fixed bottom-0 w-full flex bg-darkblue">
-                    <Player />
                 </div>
             </main>
             <Modal opened={uploadModalOpened} onClose={onUploadModalClose} />

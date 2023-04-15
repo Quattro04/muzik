@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { YtVideo } from "@/pages/search";
+import { useApi } from "@/hooks/useApi";
 
 export const YtUploadModal = (
     {
@@ -30,8 +31,9 @@ export const YtUploadModal = (
     const [titleError, setTitleError] = useState<boolean>(false);
     const [releaseYearError, setReleaseYearError] = useState<boolean>(false);
     const [imageError, setImageError] = useState<boolean>(false);
-
     const [loading, setLoading] = useState<boolean>(false);
+
+    const { addSongFromYt } = useApi();
 
     const closeModal = () => {
         setArtist('');
@@ -127,34 +129,15 @@ export const YtUploadModal = (
 
         setLoading(true);
 
-        const body = {
-            id: selectedYtVideo.videoId,
-            url: selectedYtVideo.url,
-            image,
-            duration: selectedYtVideo.seconds,
-            timestamp: selectedYtVideo.timestamp,
-            releaseYear,
-            artist,
-            title
-        }
-
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/yt-add`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authentication': process.env.NEXT_PUBLIC_AUTH_TOKEN as string
-                },
-                body: JSON.stringify(body)
-            });
-            const resp = await res.json();
-    
-            setLoading(false);
-            onSuccess(resp)
-        } catch (e: any) {
+            const res = await addSongFromYt(selectedYtVideo, image, releaseYear, artist, title);
+            onSuccess(res)
+        } catch(e) {
             onFail(e)
         }
-        
+
+        setLoading(false);
+
     }
 
     return (
