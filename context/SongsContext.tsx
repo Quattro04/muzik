@@ -5,7 +5,9 @@ interface SongsCtx {
     songs: Song[];
     fetchSongs: (callback?: () => void) => Promise<void>;
     playedSong: Song | undefined;
-    playSong: (_: Song, callback?: () => void) => void;
+    loadingSong: string | undefined;
+    setLoadingSong: (_: string | undefined) => void;
+    playSong: (_: Song) => void;
     isPlaying: boolean;
     setIsPlaying: (_: boolean) => void;
     nextSong: () => void;
@@ -17,6 +19,8 @@ const SongsContext = createContext<SongsCtx>(
         songs: [],
         fetchSongs: () => Promise.resolve(),
         playedSong: undefined,
+        loadingSong: undefined,
+        setLoadingSong: () => {},
         playSong: () => {},
         isPlaying: false,
         setIsPlaying: () => {},
@@ -42,6 +46,7 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
 
     const [songs, setSongs] = useState<Song[]>([]);
     const [playedSong, setPlayedSong] = useState<Song | undefined>(undefined);
+    const [loadingSong, setLoadingSong] = useState<string | undefined>(undefined);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
     const { getSongs } = useApi();
@@ -69,9 +74,8 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
         setIsPlaying(false);
     }
 
-    const playSong = (song: Song, callback?: () => void) => {
+    const playSong = (song: Song) => {
         setPlayedSong(song);
-        callback?.();
     }
 
     return (
@@ -80,6 +84,8 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
                 songs,
                 fetchSongs: fetchData,
                 playedSong,
+                loadingSong,
+                setLoadingSong,
                 playSong,
                 isPlaying,
                 setIsPlaying,

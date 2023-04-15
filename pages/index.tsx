@@ -11,10 +11,9 @@ import { useUser } from '@/context/UserContext'
 export default function Home() {
 
     const [isLoading, setIsLoading] = useState(true)
-    const [songLoading, setSongLoading] = useState<string>('');
     const [username, setUsername] = useState<string>('');
 
-    const { songs, playedSong, isPlaying, fetchSongs, playSong } = useSongs();
+    const { songs, playedSong, isPlaying, fetchSongs, playSong, loadingSong, setLoadingSong } = useSongs();
     const { isMobile } = useInfo();
     const { user, setUser } = useUser();
     
@@ -26,10 +25,8 @@ export default function Home() {
     }, [])
 
     const onPlaySong = (song: Song) => {
-        setSongLoading(song.id)
-        playSong(song, () => {
-            setSongLoading('');
-        });
+        setLoadingSong(song.id)
+        playSong(song);
     }
 
     const usernameSubmit = (e: FormEvent) => {
@@ -52,15 +49,15 @@ export default function Home() {
                         {songs.filter(s => s.users.includes(user)).map((song, idx) =>
                             <li
                                 key={idx}
-                                className={`relative basis-12 flex items-center flex-1 py-2 sm:py-3 px-3 sm:px-6 cursor-pointer rounded ${songLoading === song.id || playedSong?.id === song.id ? 'bg-lightblue' : ''}`}
+                                className={`relative basis-12 flex items-center flex-1 py-2 sm:py-3 px-3 sm:px-6 cursor-pointer rounded ${loadingSong === song.id || playedSong?.id === song.id ? 'bg-lightblue' : ''}`}
                                 onClick={() => onPlaySong(song)}
                             >
-                                {songLoading !== song.id &&
+                                {loadingSong !== song.id &&
                                     <div className="w-10 h-10 sm:w-12 sm:h-12 relative mr-4">
                                         <img className="h-full rounded" src={song.image} alt="Art cover" style={{ objectFit: 'cover' }} />
                                     </div>
                                 }
-                                {songLoading === song.id &&
+                                {loadingSong === song.id &&
                                     <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center mr-4">
                                         <LoadingSpinner width={30} height={30} />
                                     </div>

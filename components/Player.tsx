@@ -11,7 +11,7 @@ export default function Player() {
     const audioRef = useRef<HTMLVideoElement>(null);
     const [audioSrc, setAudioSrc] = useState<string>("");
 
-    const { playedSong, nextSong } = useSongs();
+    const { playedSong, nextSong, setLoadingSong } = useSongs();
     const [firstTime, setFirstTime] = useState<boolean>(true);
 
     useEffect(() => {
@@ -40,6 +40,10 @@ export default function Player() {
 
                 audioRef.current.addEventListener('ended', () => {
                     nextSong();
+                });
+
+                audioRef.current.addEventListener('loadeddata', function () {
+                    setLoadingSong(undefined)
                 });
                 setFirstTime(false);
             }
