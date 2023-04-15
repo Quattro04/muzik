@@ -151,8 +151,8 @@ export default function Search() {
                                         <div className="flex">
                                             <iframe
                                                 className="rounded-t-lg"
-                                                width="360"
-                                                height="220"
+                                                width="350"
+                                                height="200"
                                                 src={`https://www.youtube.com/embed/${video.videoId}`}
                                                 title={video.title}
                                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
