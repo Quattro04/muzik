@@ -53,9 +53,9 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
 
         if (songs.error) {
             alert(songs.error.message);
+        } else {
+            setSongs(songs);
         }
-
-        setSongs(songs);
         callback?.();
     }
 
