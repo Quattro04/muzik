@@ -57,13 +57,13 @@ export default function Layout({ children }: { children: ReactNode }) {
             <main className="flex flex-1 flex-col h-full">
                 <header className="flex w-full">
                     <nav className="flex-1 border-gray-200 px-4 lg:px-6 py-2.5 bg-gray-800">
-                        <div className="flex flex-1 justify-between items-center mx-auto max-w-screen-xl">
+                        <div className="flex flex-1 justify-between items-center">
                             <Link href="/" className="flex items-center">
-                                <Image src="/logo.png" width="30" height="30" alt="Muzik Logo" />
+                                <Image className="mr-0 sm:mr-4" src="/logo.png" width="30" height="30" alt="Muzik Logo" />
                                 <span className="hidden sm:block self-center text-xl font-semibold whitespace-nowrap text-white">Muzik</span>
                             </Link>
                             {canAdd &&
-                                <form className="flex items-center" onSubmit={onSearchSubmit}>   
+                                <form className="flex items-center ml-auto" onSubmit={onSearchSubmit}>   
                                     <label className="sr-only">Search Youtube</label>
                                     <div className="relative w-full">
                                         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
