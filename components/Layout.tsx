@@ -67,7 +67,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                                                 </div>
                                                 <input
                                                     type="text"
-                                                    className="text-xs sm:text-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full pl-8 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                                    className="text-md bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full pl-8 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                                                     placeholder="Search Youtube"
                                                     value={searchQuery}
                                                     onChange={e => setSearchQuery(e.target.value)}
