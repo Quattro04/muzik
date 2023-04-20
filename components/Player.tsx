@@ -57,7 +57,7 @@ export default function Player() {
               
             navigator.mediaSession.metadata = metadata;
 
-            setAudioSrc(`https://193.77.22.228/song/${encodeURI(playedSong.file)}`)
+            setAudioSrc(`${process.env.NEXT_PUBLIC_API_URL}/song/${playedSong.id}`)
         }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
