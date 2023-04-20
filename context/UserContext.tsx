@@ -2,7 +2,7 @@ import { createContext, ReactNode, useContext, useEffect, useState } from "react
 
 interface UserCtx {
     user: string | undefined;
-    setUser: (u: string) => void;
+    setUser: (u: string | undefined) => void;
 };
 
 const UserContext = createContext<UserCtx>(
