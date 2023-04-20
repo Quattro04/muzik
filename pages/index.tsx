@@ -75,7 +75,7 @@ export default function Home() {
                     <form className="flex flex-1 items-center justify-center" onSubmit={(e) => usernameSubmit(e)}>
                         <input
                             type="text"
-                            className="text-xs sm:text-sm border rounded-lg block pl-3 p-2 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                            className="text-md border rounded-lg block pl-3 p-2 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                             placeholder="Username"
                             value={username}
                             onChange={e => setUsername(e.target.value)}
