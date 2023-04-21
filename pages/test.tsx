@@ -2,17 +2,11 @@ import Layout from "@/components/Layout";
 import { useSongs } from "@/context/SongsContext";
 import { useEffect, useState } from "react";
 import YouTube from 'react-youtube';
-import ytdl from 'ytdl-core';
 
 export default function Text() {
 
-    const { songs, fetchSongs} = useSongs();
+    // const { songs } = useSongs();
     const [ showYt, setShowYt ] = useState<boolean>(false);
-
-    useEffect(() => {
-        fetchSongs();
-        gett();
-    }, [])
 
     const opts = {
         height: '390',
@@ -22,22 +16,21 @@ export default function Text() {
         },
     };
 
-    const gett = async () => {
-        let info = await ytdl.getInfo('YxIiPLVR6NA');
-        let audioFormats = ytdl.filterFormats(info.formats, 'audioonly');
-        console.log('info ', info)
-        console.log('Formats with only audio: ' + audioFormats.length);
+    const ready = (e: any) => {
+        console.log('REDYYYYY ');
+        console.log(e);
     }
 
     return (
         <Layout>
             {showYt &&
-                <div className="h-12">
-                    <YouTube key={songs[0].id} videoId={songs[0].id} opts={opts} />
-                </div>
+                // <div className="h-12">
+                //     <YouTube videoId="YxIiPLVR6NA" opts={opts} onReady={(e) => ready(e)} />
+                // </div>
+                <video src="https://www.youtube.com/embed/tgbNymZ7vqY" controls />
             }
-            {!showYt && songs && songs.length > 0 &&
-                <div onClick={() => setShowYt(true)} className="text-white">{songs[0].title}</div>
+            {!showYt &&
+                <div onClick={() => setShowYt(true)} className="text-white">TOITLE</div>
             }
 
 
