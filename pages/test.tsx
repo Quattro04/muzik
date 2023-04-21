@@ -24,10 +24,9 @@ export default function Text() {
     return (
         <Layout>
             {showYt &&
-                // <div className="h-12">
-                //     <YouTube videoId="YxIiPLVR6NA" opts={opts} onReady={(e) => ready(e)} />
-                // </div>
-                <video src="https://www.youtube.com/embed/tgbNymZ7vqY" controls />
+                <div className="h-12">
+                    <YouTube videoId="YxIiPLVR6NA" opts={opts} onReady={(e) => ready(e)} />
+                </div>
             }
             {!showYt &&
                 <div onClick={() => setShowYt(true)} className="text-white">TOITLE</div>
