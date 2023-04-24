@@ -5,8 +5,8 @@ interface SongsCtx {
     songs: Song[];
     fetchSongs: (callback?: () => void) => Promise<void>;
     playedSong: Song | undefined;
-    loadingSong: string | undefined;
-    setLoadingSong: (_: string | undefined) => void;
+    loadingSong: number | undefined;
+    setLoadingSong: (_: number | undefined) => void;
     playSong: (_: Song) => void;
     isPlaying: boolean;
     setIsPlaying: (_: boolean) => void;
@@ -30,7 +30,8 @@ const SongsContext = createContext<SongsCtx>(
 );
 
 export interface Song {
-    id: string;
+    id: number;
+    ytId: string;
     file: string;
     title: string;
     artist: string;
@@ -38,7 +39,7 @@ export interface Song {
     timestamp: string;
     releaseYear: string;
     image: string;
-    users: string[];
+    users: string;
     createdAt: string;
 }
 
@@ -46,15 +47,15 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
 
     const [songs, setSongs] = useState<Song[]>([]);
     const [playedSong, setPlayedSong] = useState<Song | undefined>(undefined);
-    const [loadingSong, setLoadingSong] = useState<string | undefined>(undefined);
+    const [loadingSong, setLoadingSong] = useState<number | undefined>(undefined);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
     const { getSongs } = useApi();
 
 
     const fetchData = async (callback?: () => void) => {
-        
-        const songs = await getSongs();
+        const res = await fetch('/api/audio');
+        const songs = await res.json();
 
         if (songs.error) {
             alert(songs.error.message);

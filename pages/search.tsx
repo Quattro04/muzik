@@ -13,6 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { Song, useSongs } from "@/context/SongsContext";
 import { useApi } from "@/hooks/useApi";
+import { useUser } from "@/context/UserContext";
 
 export interface YtVideo {
     ago: string;
@@ -46,7 +47,7 @@ export default function Search() {
     const [ytModalOpened, setYtModalOpened] = useState<boolean>(false);
 
     const { songs, fetchSongs } = useSongs();
-    const { addUserToSong, getYtVideos } = useApi();
+    const { user } = useUser();
 
     useEffect(() => {
         fetchSongs();
@@ -57,8 +58,11 @@ export default function Search() {
             return
         }
         setLoading(true);
-        const videos = await getYtVideos(query)
-        setYtVideos(videos)
+
+        const res = await fetch(`api/audio/search/${query}`);
+        const songsRes = await res.json();
+        setYtVideos(songsRes.videos)
+
         setLoading(false);
     }
 
@@ -93,23 +97,53 @@ export default function Search() {
     }, [router.asPath])
 
     const compareToQuery = (file: string) => {
-        return query ? file.toLowerCase().includes(decodeURI(query).toLowerCase()) : false;
+        // return query ? file.toLowerCase().includes(decodeURI(query).toLowerCase()) : false;
 
-        // if (!query) return false;
-        // const q = decodeURI(query);
-        // const arr = q.split(' ')
-        // for (let i = 0; i < arr.length; i++) {
-        //     if (file.toLowerCase().includes(arr[i].toLowerCase())) {
-        //         return true;
-        //     }
-        // }
-        // return false;
+        if (!query) return false;
+        const q = decodeURI(query);
+        const arr = q.split(' ');
+        for (let i = 0; i < arr.length; i++) {
+            const word = arr[i].trim().toLowerCase();
+            if (!file.toLowerCase().includes(word)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     const addFromServer = async (song: Song) => {
         const res = await addUserToSong(song);
         if (res.message) {
             toast.success(res.message);
+            fetchSongs();
+        }
+    }
+
+    const addUserToSong = async (song: Song) => {
+
+        if (user && song.users.includes(user)) {
+            alert('You already have this song in your library');
+            return {};
+        };
+
+        const body = {
+            id: song.id,
+            user,
+        };
+
+        try {
+            const res = await fetch(`api/audio/addUser`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body)
+            });
+            const resp = await res.json();
+            return resp;
+        } catch (e: any) {
+            console.log('Error adding user to song:');
+            console.log(e);
         }
     }
 
@@ -129,21 +163,22 @@ export default function Search() {
                     >
                         Back to library
                     </Link>
-                    {songs.filter(s => compareToQuery(s.file)).length > 0 &&
+                    {songs.filter(s => compareToQuery(`${s.artist} ${s.title}`)).length > 0 &&
                         <div className="flex flex-col w-full mb-4">
-                            <h2 className="text-white text-lg mb-3">On server:</h2>
+                            <h2 className="text-white text-lg mb-3">Already added:</h2>
                             <ul className="flex w-full flex-col mb-auto divide-y divide-lightblue mx-auto max-w-screen-xl">
-                                {songs.filter(s => compareToQuery(s.file)).map(song =>
+                                {songs.filter(s => compareToQuery(`${s.artist} ${s.title}`)).map(song =>
                                     <li
                                         key={song.id}
                                         className="relative basis-12 flex items-center flex-1 pr-4 rounded"
                                     >
-                                        <img className="mr-4 sm:mr-8 rounded" src={song.image} width={55} height={40} alt="Art cover" />
-                                        <span className="text-white flex-1 text-xs sm:text-sm mr-4">{song.title}</span>
-                                        <span className="text-white flex-1 text-xs sm:text-sm opacity-80 mr-4">{song.artist}</span>
-                                        <span className="text-white text-xs sm:text-sm opacity-80 mr-4">
-                                            By: {song.users}
-                                        </span>
+                                        <div className="w-10 h-10 sm:w-12 sm:h-12 relative mr-4">
+                                            <img className="h-full rounded" src={song.image} alt="Art cover" style={{ objectFit: 'cover' }} />
+                                        </div>
+                                        <div className="flex flex-1 flex-col sm:flex-row overflow-hidden">
+                                            <span className="text-white flex-1 text-xs sm:text-sm mr-4 pointer-events-none truncate">{song.title}</span>
+                                            <span className="text-white flex-1 text-xs sm:text-sm opacity-50 mr-4 pointer-events-none truncate">{song.artist}</span>
+                                        </div>
                                         <button
                                             className="text-white bg-lightblue font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 hover:bg-gray-700 focus:outline-none focus:ring-gray-800"
                                             onClick={() => addFromServer(song)}

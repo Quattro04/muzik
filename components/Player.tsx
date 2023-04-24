@@ -15,7 +15,7 @@ export default function Player() {
     const [firstTime, setFirstTime] = useState<boolean>(true);
 
     useEffect(() => {
-        if (playedSong && playedSong.file && audioRef.current) {
+        if (playedSong && audioRef.current) {
             if (firstTime) {
                 navigator.mediaSession.setActionHandler('play', function() {
                     play();
@@ -57,7 +57,7 @@ export default function Player() {
               
             navigator.mediaSession.metadata = metadata;
 
-            setAudioSrc(`${process.env.NEXT_PUBLIC_API_URL}/song/${playedSong.id}`)
+            setAudioSrc(`api/audio/${playedSong.ytId}`)
         }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

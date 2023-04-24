@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { YtVideo } from "@/pages/search";
 import { useApi } from "@/hooks/useApi";
+import { useUser } from "@/context/UserContext";
 
 export const YtUploadModal = (
     {
@@ -33,7 +34,7 @@ export const YtUploadModal = (
     const [imageError, setImageError] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const { addSongFromYt } = useApi();
+    const { user } = useUser();
 
     const closeModal = () => {
         setArtist('');
@@ -92,6 +93,34 @@ export const YtUploadModal = (
     const imageChange = (e: any) => {
         setImage(e.target.value);
         setImageError(false);
+    }
+
+    const addSongFromYt = async (ytVideo: YtVideo, image: string, releaseYear: string, artist: string, title: string) => {
+        const body = {
+            ytId: ytVideo.videoId,
+            url: ytVideo.url,
+            image,
+            duration: ytVideo.seconds,
+            timestamp: ytVideo.timestamp,
+            releaseYear,
+            artist,
+            title,
+            user
+        }
+
+        try {
+            const res = await fetch(`api/audio/add`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body)
+            });
+            const resp = await res.json();
+            return resp;
+        } catch (e: any) {
+            throw new Error(e);
+        }
     }
 
     useEffect(() => {
