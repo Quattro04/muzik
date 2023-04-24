@@ -26,7 +26,8 @@
         "react-toastify": "^9.1.2",
         "react-youtube": "^10.1.0",
         "typescript": "5.0.2",
-        "yt-search": "^2.10.4"
+        "yt-search": "^2.10.4",
+        "ytdl-core": "^4.11.4"
     },
     "devDependencies": {
         "@types/yt-search": "^2.3.2",
