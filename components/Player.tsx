@@ -32,7 +32,7 @@ export default function Player() {
 
                 audioRef.current.addEventListener('error', function(e: any) {
                     console.log('ERORRRRORRRRR ');
-                    console.log(e.target?.error.code);
+                    console.log(e.target?.error);
                     setTimeout(() => {
                         nextSong();
                     }, 5000)
@@ -57,7 +57,7 @@ export default function Player() {
               
             navigator.mediaSession.metadata = metadata;
 
-            setAudioSrc(`api/audio/${playedSong.ytId}`)
+            setAudioSrc(`${process.env.NEXT_PUBLIC_API_URL}/mp3/${playedSong.file}`)
         }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

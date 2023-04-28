@@ -62,7 +62,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                                 <Image className="mr-0 sm:mr-4" src="/logo.png" width="30" height="30" alt="Muzik Logo" />
                                 <span className="hidden sm:block self-center text-xl font-semibold whitespace-nowrap text-white">Muzik</span>
                             </Link>
-                            {canAdd &&
+                            {/* {canAdd &&
                                 <form className="flex items-center ml-auto" onSubmit={onSearchSubmit}>   
                                     <label className="sr-only">Search Youtube</label>
                                     <div className="relative w-full">
@@ -82,6 +82,15 @@ export default function Layout({ children }: { children: ReactNode }) {
                                         />
                                     </div>
                                 </form>
+                            } */}
+                            {canAdd &&
+                                <a
+                                    href="#"
+                                    className="text-white font-medium rounded-lg text-sm px-4 ml-auto lg:px-5 py-2 lg:py-2.5 mr-2 hover:bg-gray-700 focus:outline-none focus:ring-gray-800"
+                                    onClick={() => setUploadModalOpened(true)}
+                                >
+                                    Upload
+                                </a>
                             }
                             <button
                                 id="dropdownDefaultButton"

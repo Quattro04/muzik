@@ -9,11 +9,11 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
     const [artist, setArtist] = useState<string>('');
     const [title, setTitle] = useState<string>('');
     const [releaseYear, setReleaseYear] = useState<string>('');
-    const [cover, setCover] = useState<string>('');
+    // const [cover, setCover] = useState<string>('');
     const [artistError, setArtistError] = useState<boolean>(false);
     const [titleError, setTitleError] = useState<boolean>(false);
     const [releaseYearError, setReleaseYearError] = useState<boolean>(false);
-    const [coverError, setCoverError] = useState<boolean>(false);
+    // const [coverError, setCoverError] = useState<boolean>(false);
     const [fileError, setFileError] = useState<boolean>(false);
 
     const closeModal = (res?: any) => {
@@ -21,11 +21,11 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
         setArtist('');
         setTitle('');
         setReleaseYear('');
-        setCover('');
+        // setCover('');
         setArtistError(false);
         setTitleError(false);
         setReleaseYearError(false);
-        setCoverError(false);
+        // setCoverError(false);
         setFileError(false);
         setOpen(false);
         onClose(res);
@@ -66,12 +66,12 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
         } else {
             setReleaseYearError(false);
         }
-        if (cover === '') {
-            setCoverError(true);
-            return;
-        } else {
-            setCoverError(false);
-        }
+        // if (cover === '') {
+        //     setCoverError(true);
+        //     return;
+        // } else {
+        //     setCoverError(false);
+        // }
         if (uploadedFile === null) {
             setFileError(true);
             return;
@@ -79,19 +79,16 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
             setFileError(false);
         }
 
-        const body = new FormData();
-        body.append('artist', artist);
-        body.append('title', title);
-        body.append('releaseYear', releaseYear);
-        body.append('cover', cover);
-        body.append('file', uploadedFile);
+        const formData = new FormData();
+        // formData.append('artist', artist);
+        // formData.append('title', title);
+        // formData.append('releaseYear', releaseYear);
+        // body.append('cover', cover);
+        formData.append('file', uploadedFile);
 
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
             method: "POST",
-            headers: {
-                'Authentication': process.env.NEXT_PUBLIC_AUTH_TOKEN as string
-            },
-            body
+            body: formData
         });
         const response = await res.json();
         closeModal(response);
@@ -112,10 +109,10 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
         setReleaseYearError(false);
     }
 
-    const coverChange = (e: any) => {
-        setCover(e.target.value);
-        setCoverError(false);
-    }
+    // const coverChange = (e: any) => {
+    //     setCover(e.target.value);
+    //     setCoverError(false);
+    // }
 
     useEffect(() => {
         setOpen(opened);
@@ -169,13 +166,13 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
                             value={releaseYear}
                             onChange={releaseYearChange}
                         />
-                        <input
+                        {/* <input
                             type="string"
                             className={`p-3 rounded-lg outline-0 border-2 ${coverError ? 'border-red-500' : 'border-transparent'}`}
                             placeholder="Art Cover"
                             value={cover}
                             onChange={coverChange}
-                        />
+                        /> */}
                         <input
                             className={`text-white border-2 ${fileError ? 'border-red-500' : 'border-transparent'}`}
                             type="file" 
