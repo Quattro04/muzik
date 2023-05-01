@@ -20,6 +20,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [uploadModalOpened, setUploadModalOpened] = useState<boolean>(false);
     const [canAdd, setCanAdd] = useState<boolean>(false);
+    const [canUpload, setCanUpload] = useState<boolean>(false);
     const [userActionsOpened, setUserActionsOpened] = useState<boolean>(false);
 
     const { fetchSongs } = useSongs();
@@ -41,8 +42,15 @@ export default function Layout({ children }: { children: ReactNode }) {
     }
 
     useEffect(() => {
-        if (user === 'matija' || user === 'mojca') {
+        if (user === 'matija') {
+            setCanUpload(true);
+        } else {
+            setCanUpload(false);
+        }
+        if (user !== 'matija') {
             setCanAdd(true);
+        } else {
+            setCanAdd(false);
         }
     }, [user])
 
@@ -54,7 +62,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
     return (
         <>
-            <main className="flex flex-1 flex-col h-full">
+            <main className="flex flex-1 flex-col h-full overflow-auto">
                 <header className="flex w-full">
                     <nav className="flex-1 border-gray-200 px-4 lg:px-6 py-2.5 bg-gray-800">
                         <div className="flex flex-1 justify-between items-center">
@@ -84,13 +92,20 @@ export default function Layout({ children }: { children: ReactNode }) {
                                 </form>
                             } */}
                             {canAdd &&
-                                <a
-                                    href="#"
+                                <Link
+                                    className="text-white font-medium text-sm px-4 ml-auto lg:px-5 py-2 lg:py-2.5 mr-2"
+                                    href="/add"
+                                >
+                                    Add
+                                </Link>
+                            }
+                            {canUpload &&
+                                <button
                                     className="text-white font-medium rounded-lg text-sm px-4 ml-auto lg:px-5 py-2 lg:py-2.5 mr-2 hover:bg-gray-700 focus:outline-none focus:ring-gray-800"
                                     onClick={() => setUploadModalOpened(true)}
                                 >
                                     Upload
-                                </a>
+                                </button>
                             }
                             <button
                                 id="dropdownDefaultButton"
@@ -114,7 +129,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                         </div>
                     </nav>
                 </header>
-                <div className="flex flex-1 w-full flex-col bg-darkblue overflow-auto pb-20">
+                <div className="flex flex-1 w-full flex-col bg-darkblue pb-20">
                     {children}
                 </div>
             </main>

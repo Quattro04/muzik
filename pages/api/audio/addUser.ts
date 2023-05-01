@@ -15,10 +15,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         await prisma.song.update({
             where: {
-              id: id,
+                id: id,
             },
             data: {
-              users: `${song?.users},${user}`,
+                users: `${song?.users},${user}`,
             },
         });
         return res.json({ message: 'Song added successfully' })

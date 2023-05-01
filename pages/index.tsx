@@ -35,6 +35,11 @@ export default function Home() {
         e.preventDefault();
     }
 
+    const parseDate = (dateStr: string) => {
+        const date = new Date(dateStr);
+        return `${date.getDate()}.${date.getMonth()}.${date.getFullYear()}`
+    }
+
     return (
         <>
             <Head>
@@ -46,6 +51,18 @@ export default function Home() {
             <Layout>
                 {user &&
                     <ul className="flex w-full flex-col mb-auto mx-auto max-w-screen-xl">
+                        <li className="flex flex-1 items-center py-2 sm:py-3 px-3 sm:px-6 border-b-2 border-slate-800 z-10 bg-darkblue">
+                            <div className="w-10 sm:w-12 mr-4" />
+                            <span className="flex grow-[2] shrink-[2] basis-0 text-white text-xs sm:text-sm opacity-80 pointer-events-none text-slate-400">
+                                Title
+                            </span>
+                            <span className="flex-1 text-right text-white text-xs sm:text-sm opacity-80 pointer-events-none text-slate-400">
+                                Released
+                            </span>
+                            <span className="flex-1 text-right text-white text-xs sm:text-sm opacity-80 pointer-events-none text-slate-400">
+                                Added
+                            </span>
+                        </li>
                         {songs.filter(s => s.users.includes(user)).map((song, idx) =>
                             <li
                                 key={idx}
@@ -54,7 +71,12 @@ export default function Home() {
                             >
                                 {loadingSong !== song.id &&
                                     <div className="w-10 h-10 sm:w-12 sm:h-12 relative mr-4">
-                                        <img className="h-full rounded" src={song.image} alt="Art cover" style={{ objectFit: 'cover' }} />
+                                        <img
+                                            className="h-full rounded"
+                                            src={`${process.env.NEXT_PUBLIC_API_URL}/images/${song.id}.jpg`}
+                                            alt="Art cover"
+                                            style={{ objectFit: 'cover' }}
+                                        />
                                     </div>
                                 }
                                 {loadingSong === song.id &&
@@ -62,11 +84,20 @@ export default function Home() {
                                         <LoadingSpinner width={30} height={30} />
                                     </div>
                                 }
-                                <div className="flex flex-1 flex-col sm:flex-row overflow-hidden">
-                                    <span className="text-white flex-1 text-xs sm:text-sm mr-4 pointer-events-none truncate">{song.title}</span>
-                                    <span className="text-white flex-1 text-xs sm:text-sm opacity-50 mr-4 pointer-events-none truncate">{song.artist}</span>
+                                <div className="flex grow-[2] shrink-[2] basis-0 flex-col overflow-hidden">
+                                    <span className="text-white text-xs sm:text-sm mb-1 pointer-events-none truncate">
+                                        {song.title}
+                                    </span>
+                                    <span className="text-white text-xs sm:text-sm opacity-50 pointer-events-none truncate">
+                                        {song.artist}
+                                    </span>
                                 </div>
-                                <span className="text-white text-xs sm:text-sm opacity-80 pointer-events-none" style={{ flexBasis: '40px' }}>{song.releaseYear}</span>
+                                <span className="flex-1 text-right text-white text-xs sm:text-sm opacity-80 pointer-events-none">
+                                    {song.releaseYear}
+                                </span>
+                                <span className="flex-1 text-right text-white text-xs sm:text-sm opacity-80 pointer-events-none">
+                                    {parseDate(song.createdAt)}
+                                </span>
                             </li>
                         )}
                     </ul>

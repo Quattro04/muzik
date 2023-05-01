@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
+import jsmediatags from 'jsmediatags';
+import { TagType } from "jsmediatags/types";
+import { useUser } from "@/context/UserContext";
 
 export default function SongUploadModal({ opened, onClose }: { opened: boolean, onClose: (res: any) => void }) {
 
     const [open, setOpen] = useState<boolean>(false);
-    const [uploadedFile, setUploadedFile] = useState(null);
-    const [artist, setArtist] = useState<string>('');
-    const [title, setTitle] = useState<string>('');
+    const [uploadedFile, setUploadedFile] = useState<File | undefined>(undefined);
+    // const [artist, setArtist] = useState<string>('');
+    // const [title, setTitle] = useState<string>('');
     const [releaseYear, setReleaseYear] = useState<string>('');
     // const [cover, setCover] = useState<string>('');
     const [artistError, setArtistError] = useState<boolean>(false);
@@ -16,10 +19,12 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
     // const [coverError, setCoverError] = useState<boolean>(false);
     const [fileError, setFileError] = useState<boolean>(false);
 
+    const { user } = useUser();
+
     const closeModal = (res?: any) => {
-        setUploadedFile(null);
-        setArtist('');
-        setTitle('');
+        setUploadedFile(undefined);
+        // setArtist('');
+        // setTitle('');
         setReleaseYear('');
         // setCover('');
         setArtistError(false);
@@ -31,78 +36,130 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
         onClose(res);
     }
 
-    const uploadToClient = (event: any) => {
+    const splitArray = (arr: number[], chunkSize: number): number[][] => {
+        let result = [];
+      
+        for (let i = 0; i < arr.length; i += chunkSize) {
+            let chunk = arr.slice(i, i + chunkSize);
+            result.push(chunk);
+        }
+
+        const left = 4 - result.length;
+        if (left > 0) {
+            for (let i = 0; i < left; i ++) {
+                result.push([]);
+            }
+        }
+      
+        return result;
+    }
+
+    const uploadToClient = async (event: any) => {
         if (event.target.files && event.target.files[0]) {
             setFileError(false);
             const i = event.target.files[0];
             setUploadedFile(i);
 
             // Fill artist and title from file name
-            const arr = i.name.split(/-(.*)/s);
-            if (arr.length > 1) {
-                setArtist(arr[0].trim());
-                setTitle(arr[1].split('.')[0].trim());
-            }
+            // const arr = i.name.split(/-(.*)/s);
+            // if (arr.length > 1) {
+            //     setArtist(arr[0].trim());
+            //     setTitle(arr[1].split('.')[0].trim());
+            // }
+
+            // setArtist(data.tags.artist);
+            // setTitle(data.tags.title);
         }
     };
     
     const uploadToServer = async (event: any) => {
 
-        if (artist === '') {
-            setArtistError(true);
-            return;
-        } else {
-            setArtistError(false);
-        }
-        if (title === '') {
-            setTitleError(true);
-            return;
-        } else {
-            setTitleError(false);
-        }
+        // Check if file and realeaseDate are not empty
         if (releaseYear.length !== 4) {
             setReleaseYearError(true);
             return;
         } else {
             setReleaseYearError(false);
         }
-        // if (cover === '') {
-        //     setCoverError(true);
-        //     return;
-        // } else {
-        //     setCoverError(false);
-        // }
-        if (uploadedFile === null) {
+        if (uploadedFile === undefined) {
             setFileError(true);
             return;
         } else {
             setFileError(false);
         }
 
-        const formData = new FormData();
-        // formData.append('artist', artist);
-        // formData.append('title', title);
-        // formData.append('releaseYear', releaseYear);
-        // body.append('cover', cover);
-        formData.append('file', uploadedFile);
+        // Get metadata from selected mp3 file
+        const data: TagType = await new Promise((resolve, reject) => {
+            jsmediatags.read(uploadedFile, {
+                onSuccess: tag => {
+                    resolve(tag);
+                },
+                onError: error => {
+                    reject(error);
+                }
+            });
+        });
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
+        // Save data to db and get id of the song
+        const body = {
+            artist: data.tags.artist,
+            title: data.tags.title,
+            releaseYear,
+            user
+        }
+        const res = await fetch(`/api/audio/add`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body)
+        });
+
+        const response = await res.json();
+        const songId = response.song.id;
+
+        const songFile = new File([uploadedFile], songId + '.mp3', { type: 'audio/mpeg' })
+
+        const formData = new FormData();
+        formData.append('file', songFile);
+
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
             method: "POST",
             body: formData
         });
-        const response = await res.json();
+
+
+        const arr = uploadedFile.name.split('.');
+        arr.pop();
+        const fileNoExtension = arr.join('');
+
+        if (data.tags.picture) {
+            const base64Data = Buffer.from(data.tags.picture.data);
+            const blob = new Blob([base64Data as BlobPart], {
+                type: data.tags.picture.format,
+            });
+            const imageFile = new File([blob], songId + '.jpg', { type: data.tags.picture.format })
+
+            const formData = new FormData();
+            formData.append('file', imageFile);
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/img-upload`, {
+                method: "POST",
+                body: formData
+            });
+        }
+
         closeModal(response);
     };
 
-    const artistChange = (e: any) => {
-        setArtist(e.target.value);
-        setArtistError(false);
-    }
+    // const artistChange = (e: any) => {
+    //     setArtist(e.target.value);
+    //     setArtistError(false);
+    // }
 
-    const titleChange = (e: any) => {
-        setTitle(e.target.value);
-        setTitleError(false);
-    }
+    // const titleChange = (e: any) => {
+    //     setTitle(e.target.value);
+    //     setTitleError(false);
+    // }
 
     const releaseYearChange = (e: any) => {
         setReleaseYear(e.target.value);
@@ -145,7 +202,7 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
                         <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
                             Upload a song to add it to the list of songs.
                         </p>
-                        <input
+                        {/* <input
                             type="text"
                             className={`p-3 rounded-lg outline-0 border-2 ${artistError ? 'border-red-500' : 'border-transparent'}`}
                             placeholder="Artist"
@@ -158,7 +215,7 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
                             placeholder="Title"
                             value={title}
                             onChange={titleChange}
-                        />
+                        /> */}
                         <input
                             type="number"
                             className={`p-3 rounded-lg outline-0 border-2 ${releaseYearError ? 'border-red-500' : 'border-transparent'}`}

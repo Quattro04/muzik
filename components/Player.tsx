@@ -52,12 +52,12 @@ export default function Player() {
                 title: playedSong.title,
                 artist: playedSong.artist,
                 album: "",
-                artwork: [{ src: playedSong.image, sizes: "1280x720", type: "image/jpeg" }]
+                artwork: [{ src: `${process.env.NEXT_PUBLIC_API_URL}/images/${playedSong.id}.jpg`, sizes: "1280x720", type: "image/jpeg" }]
             });
               
             navigator.mediaSession.metadata = metadata;
 
-            setAudioSrc(`${process.env.NEXT_PUBLIC_API_URL}/mp3/${playedSong.file}`)
+            setAudioSrc(`${process.env.NEXT_PUBLIC_API_URL}/songs/${playedSong.id}.mp3`)
         }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
