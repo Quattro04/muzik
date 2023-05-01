@@ -1,4 +1,5 @@
 import Head from 'next/head'
+import Image from 'next/image';
 import { FormEvent, useEffect, useState } from 'react'
 
 import Player from '@/components/Player'
@@ -71,7 +72,9 @@ export default function Home() {
                             >
                                 {loadingSong !== song.id &&
                                     <div className="w-10 h-10 sm:w-12 sm:h-12 relative mr-4">
-                                        <img
+                                        <Image
+                                            width={48}
+                                            height={48}
                                             className="h-full rounded"
                                             src={`${process.env.NEXT_PUBLIC_API_URL}/images/${song.id}.jpg`}
                                             alt="Art cover"

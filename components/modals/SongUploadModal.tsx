@@ -4,54 +4,26 @@ import { faClose } from "@fortawesome/free-solid-svg-icons";
 import jsmediatags from 'jsmediatags';
 import { TagType } from "jsmediatags/types";
 import { useUser } from "@/context/UserContext";
+import LoadingSpinner from "../LoadingSpinner";
 
 export default function SongUploadModal({ opened, onClose }: { opened: boolean, onClose: (res: any) => void }) {
 
     const [open, setOpen] = useState<boolean>(false);
     const [uploadedFile, setUploadedFile] = useState<File | undefined>(undefined);
-    // const [artist, setArtist] = useState<string>('');
-    // const [title, setTitle] = useState<string>('');
     const [releaseYear, setReleaseYear] = useState<string>('');
-    // const [cover, setCover] = useState<string>('');
-    const [artistError, setArtistError] = useState<boolean>(false);
-    const [titleError, setTitleError] = useState<boolean>(false);
     const [releaseYearError, setReleaseYearError] = useState<boolean>(false);
-    // const [coverError, setCoverError] = useState<boolean>(false);
     const [fileError, setFileError] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const { user } = useUser();
 
     const closeModal = (res?: any) => {
         setUploadedFile(undefined);
-        // setArtist('');
-        // setTitle('');
         setReleaseYear('');
-        // setCover('');
-        setArtistError(false);
-        setTitleError(false);
         setReleaseYearError(false);
-        // setCoverError(false);
         setFileError(false);
         setOpen(false);
         onClose(res);
-    }
-
-    const splitArray = (arr: number[], chunkSize: number): number[][] => {
-        let result = [];
-      
-        for (let i = 0; i < arr.length; i += chunkSize) {
-            let chunk = arr.slice(i, i + chunkSize);
-            result.push(chunk);
-        }
-
-        const left = 4 - result.length;
-        if (left > 0) {
-            for (let i = 0; i < left; i ++) {
-                result.push([]);
-            }
-        }
-      
-        return result;
     }
 
     const uploadToClient = async (event: any) => {
@@ -59,16 +31,6 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
             setFileError(false);
             const i = event.target.files[0];
             setUploadedFile(i);
-
-            // Fill artist and title from file name
-            // const arr = i.name.split(/-(.*)/s);
-            // if (arr.length > 1) {
-            //     setArtist(arr[0].trim());
-            //     setTitle(arr[1].split('.')[0].trim());
-            // }
-
-            // setArtist(data.tags.artist);
-            // setTitle(data.tags.title);
         }
     };
     
@@ -88,88 +50,76 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
             setFileError(false);
         }
 
-        // Get metadata from selected mp3 file
-        const data: TagType = await new Promise((resolve, reject) => {
-            jsmediatags.read(uploadedFile, {
-                onSuccess: tag => {
-                    resolve(tag);
+        setLoading(true);
+
+        try {
+            // Get metadata from selected mp3 file
+            const data: TagType = await new Promise((resolve, reject) => {
+                jsmediatags.read(uploadedFile, {
+                    onSuccess: tag => {
+                        resolve(tag);
+                    },
+                    onError: error => {
+                        reject(error);
+                    }
+                });
+            });
+
+            // Save data to db and get id of the song
+            const body = {
+                artist: data.tags.artist,
+                title: data.tags.title,
+                releaseYear,
+                user
+            }
+            const res = await fetch(`/api/audio/add`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-                onError: error => {
-                    reject(error);
-                }
+                body: JSON.stringify(body)
             });
-        });
 
-        // Save data to db and get id of the song
-        const body = {
-            artist: data.tags.artist,
-            title: data.tags.title,
-            releaseYear,
-            user
-        }
-        const res = await fetch(`/api/audio/add`, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body)
-        });
+            const response = await res.json();
+            const songId = response.song.id;
 
-        const response = await res.json();
-        const songId = response.song.id;
-
-        const songFile = new File([uploadedFile], songId + '.mp3', { type: 'audio/mpeg' })
-
-        const formData = new FormData();
-        formData.append('file', songFile);
-
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
-            method: "POST",
-            body: formData
-        });
-
-
-        const arr = uploadedFile.name.split('.');
-        arr.pop();
-        const fileNoExtension = arr.join('');
-
-        if (data.tags.picture) {
-            const base64Data = Buffer.from(data.tags.picture.data);
-            const blob = new Blob([base64Data as BlobPart], {
-                type: data.tags.picture.format,
-            });
-            const imageFile = new File([blob], songId + '.jpg', { type: data.tags.picture.format })
-
+            // Make mp3 file with id as name and upload it to server
+            const songFile = new File([uploadedFile], songId + '.mp3', { type: 'audio/mpeg' })
             const formData = new FormData();
-            formData.append('file', imageFile);
-            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/img-upload`, {
+            formData.append('file', songFile);
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
                 method: "POST",
                 body: formData
             });
+
+            // If there is a thumbnail, upload that also to the server
+            if (data.tags.picture) {
+                const base64Data = Buffer.from(data.tags.picture.data);
+                const blob = new Blob([base64Data as BlobPart], {
+                    type: data.tags.picture.format,
+                });
+                const imageFile = new File([blob], songId + '.jpg', { type: data.tags.picture.format })
+
+                const formData = new FormData();
+                formData.append('file', imageFile);
+                await fetch(`${process.env.NEXT_PUBLIC_API_URL}/img-upload`, {
+                    method: "POST",
+                    body: formData
+                });
+            }
+            setLoading(false);
+            closeModal(response);
+        } catch (e) {
+            console.log('ERROR: ', e);
+            setLoading(false);
+            closeModal({ error: e });
         }
-
-        closeModal(response);
     };
-
-    // const artistChange = (e: any) => {
-    //     setArtist(e.target.value);
-    //     setArtistError(false);
-    // }
-
-    // const titleChange = (e: any) => {
-    //     setTitle(e.target.value);
-    //     setTitleError(false);
-    // }
 
     const releaseYearChange = (e: any) => {
         setReleaseYear(e.target.value);
         setReleaseYearError(false);
     }
-
-    // const coverChange = (e: any) => {
-    //     setCover(e.target.value);
-    //     setCoverError(false);
-    // }
 
     useEffect(() => {
         setOpen(opened);
@@ -202,20 +152,6 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
                         <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
                             Upload a song to add it to the list of songs.
                         </p>
-                        {/* <input
-                            type="text"
-                            className={`p-3 rounded-lg outline-0 border-2 ${artistError ? 'border-red-500' : 'border-transparent'}`}
-                            placeholder="Artist"
-                            value={artist}
-                            onChange={artistChange}
-                        />
-                        <input
-                            type="text"
-                            className={`p-3 rounded-lg outline-0 border-2 ${titleError ? 'border-red-500' : 'border-transparent'}`}
-                            placeholder="Title"
-                            value={title}
-                            onChange={titleChange}
-                        /> */}
                         <input
                             type="number"
                             className={`p-3 rounded-lg outline-0 border-2 ${releaseYearError ? 'border-red-500' : 'border-transparent'}`}
@@ -223,13 +159,6 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
                             value={releaseYear}
                             onChange={releaseYearChange}
                         />
-                        {/* <input
-                            type="string"
-                            className={`p-3 rounded-lg outline-0 border-2 ${coverError ? 'border-red-500' : 'border-transparent'}`}
-                            placeholder="Art Cover"
-                            value={cover}
-                            onChange={coverChange}
-                        /> */}
                         <input
                             className={`text-white border-2 ${fileError ? 'border-red-500' : 'border-transparent'}`}
                             type="file" 
@@ -238,13 +167,18 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
                         />
                     </div>
                     <div className="flex items-center justify-end p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-                        <button
-                            type="button"
-                            onClick={uploadToServer}
-                            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                        >
-                            Upload
-                        </button>
+                        {!loading &&
+                            <button
+                                type="button"
+                                onClick={uploadToServer}
+                                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                            >
+                                Upload
+                            </button>
+                        }
+                        {loading &&
+                            <LoadingSpinner width={20} height={20} />
+                        }
                     </div>
                 </div>
             </div>
