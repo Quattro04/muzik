@@ -9,6 +9,10 @@ import LoadingSpinner from '@/components/LoadingSpinner'
 import { useInfo } from '@/context/InfoContext'
 import { useUser } from '@/context/UserContext'
 
+const monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+];
+
 export default function Home() {
 
     const [isLoading, setIsLoading] = useState(true)
@@ -38,7 +42,7 @@ export default function Home() {
 
     const parseDate = (dateStr: string) => {
         const date = new Date(dateStr);
-        return `${date.getDate()}.${date.getMonth()}.${date.getFullYear()}`
+        return `${date.getDate()} ${monthNames[date.getMonth()].slice(0,3)} ${date.getFullYear()}`
     }
 
     return (
@@ -52,12 +56,12 @@ export default function Home() {
             <Layout>
                 {user &&
                     <ul className="flex w-full flex-col mb-auto mx-auto max-w-screen-xl">
-                        <li className="flex flex-1 items-center py-2 sm:py-3 px-3 sm:px-6 border-b-2 border-slate-800 z-10 bg-darkblue">
+                        <li className="flex flex-1 items-center sticky top-0 py-2 sm:py-3 px-3 sm:px-6 border-b-2 border-slate-800 z-10 bg-darkblue">
                             <div className="w-10 sm:w-12 mr-4" />
                             <span className="flex grow-[2] shrink-[2] basis-0 text-white text-xs sm:text-sm opacity-80 pointer-events-none text-slate-400">
                                 Title
                             </span>
-                            <span className="flex-1 text-right text-white text-xs sm:text-sm opacity-80 pointer-events-none text-slate-400">
+                            <span className="flex-1 text-center text-white text-xs sm:text-sm opacity-80 pointer-events-none text-slate-400">
                                 Released
                             </span>
                             <span className="flex-1 text-right text-white text-xs sm:text-sm opacity-80 pointer-events-none text-slate-400">
@@ -95,7 +99,7 @@ export default function Home() {
                                         {song.artist}
                                     </span>
                                 </div>
-                                <span className="flex-1 text-right text-white text-xs sm:text-sm opacity-80 pointer-events-none">
+                                <span className="flex-1 text-center text-white text-xs sm:text-sm opacity-80 pointer-events-none">
                                     {song.releaseYear}
                                 </span>
                                 <span className="flex-1 text-right text-white text-xs sm:text-sm opacity-80 pointer-events-none">
