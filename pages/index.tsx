@@ -8,6 +8,7 @@ import { Song, useSongs } from '@/context/SongsContext'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import { useInfo } from '@/context/InfoContext'
 import { useUser } from '@/context/UserContext'
+import PlayerPlus from '@/components/PlayerPlus';
 
 const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
@@ -18,7 +19,7 @@ export default function Home() {
     const [isLoading, setIsLoading] = useState(true)
     const [username, setUsername] = useState<string>('');
 
-    const { songs, playedSong, isPlaying, fetchSongs, playSong, loadingSong, setLoadingSong } = useSongs();
+    const { songs, playingSong, fetchSongs, userClickedPlaySong, loadingSong, setLoadingSong } = useSongs();
     const { isMobile } = useInfo();
     const { user, setUser } = useUser();
     
@@ -27,11 +28,12 @@ export default function Home() {
         fetchSongs(() => {
             setIsLoading(false)
         });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const onPlaySong = (song: Song) => {
         setLoadingSong(song.id)
-        playSong(song);
+        userClickedPlaySong(song);
     }
 
     const usernameSubmit = (e: FormEvent) => {
@@ -48,7 +50,7 @@ export default function Home() {
     return (
         <>
             <Head>
-                <title>{`${playedSong?.title ? playedSong?.title : 'Muzik'} - ${playedSong?.artist ? playedSong?.artist : 'Home'}`}</title>
+                <title>{`${playingSong?.title ? playingSong?.title : 'Muzik'} - ${playingSong?.artist ? playingSong?.artist : 'Home'}`}</title>
                 <meta name="description" content="Personal muzik storage and player" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
@@ -71,7 +73,7 @@ export default function Home() {
                         {songs.filter(s => s.users.includes(user)).map((song, idx) =>
                             <li
                                 key={idx}
-                                className={`relative basis-12 flex items-center flex-1 py-2 sm:py-3 px-3 sm:px-6 cursor-pointer rounded ${loadingSong === song.id || playedSong?.id === song.id ? 'bg-lightblue' : ''}`}
+                                className={`relative basis-12 flex items-center flex-1 py-2 sm:py-3 px-3 sm:px-6 cursor-pointer rounded ${loadingSong === song.id || playingSong?.id === song.id ? 'bg-lightblue' : ''}`}
                                 onClick={() => onPlaySong(song)}
                             >
                                 {loadingSong !== song.id &&
@@ -122,7 +124,7 @@ export default function Home() {
                     </form>
                 }
                 <div className="fixed bottom-0 w-full flex bg-darkblue">
-                    <Player />
+                    <PlayerPlus />
                 </div>
             </Layout>
         </>

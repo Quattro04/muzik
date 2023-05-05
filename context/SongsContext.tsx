@@ -3,12 +3,12 @@ import React, { useContext, useState, createContext, ReactNode } from "react";
 interface SongsCtx {
     songs: Song[];
     fetchSongs: (callback?: () => void) => Promise<void>;
-    playedSong: Song | undefined;
+    playingSong: Song | undefined;
+    userPlayedSong: Song | undefined;
     loadingSong: number | undefined;
     setLoadingSong: (_: number | undefined) => void;
-    playSong: (_: Song) => void;
-    isPlaying: boolean;
-    setIsPlaying: (_: boolean) => void;
+    playSong: (_: number) => void;
+    userClickedPlaySong: (_: Song) => void;
     nextSong: () => void;
     stop: () => void;
 };
@@ -17,12 +17,12 @@ const SongsContext = createContext<SongsCtx>(
     {
         songs: [],
         fetchSongs: () => Promise.resolve(),
-        playedSong: undefined,
+        playingSong: undefined,
+        userPlayedSong: undefined,
         loadingSong: undefined,
         setLoadingSong: () => {},
         playSong: () => {},
-        isPlaying: false,
-        setIsPlaying: () => {},
+        userClickedPlaySong: () => {},
         nextSong: () => {},
         stop: () => {}
     }
@@ -30,14 +30,9 @@ const SongsContext = createContext<SongsCtx>(
 
 export interface Song {
     id: number;
-    ytId: string;
-    file: string;
     title: string;
     artist: string;
-    duration: number;
-    timestamp: string;
     releaseYear: string;
-    image: string;
     users: string;
     createdAt: string;
 }
@@ -45,9 +40,9 @@ export interface Song {
 export function SongsContextProvider({ children }: { children: ReactNode }) {
 
     const [songs, setSongs] = useState<Song[]>([]);
-    const [playedSong, setPlayedSong] = useState<Song | undefined>(undefined);
+    const [playingSong, setPlayingSong] = useState<Song | undefined>(undefined);
+    const [userPlayedSong, setUserPlayedSong] = useState<Song | undefined>(undefined);
     const [loadingSong, setLoadingSong] = useState<number | undefined>(undefined);
-    const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
     const fetchData = async (callback?: () => void) => {
         const res = await fetch('/api/audio');
@@ -62,17 +57,24 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
     }
 
     const nextSong = () => {
-        const randomSong = Math.floor(Math.random() * songs.length);
-        playSong(songs[randomSong]);
+        // const randomSong = Math.floor(Math.random() * songs.length);
+        // playSong(songs[randomSong]);
     }
 
     const stop = () => {
-        setPlayedSong(undefined);
-        setIsPlaying(false);
+        setPlayingSong(undefined);
+        setUserPlayedSong(undefined);
     }
 
-    const playSong = (song: Song) => {
-        setPlayedSong(song);
+    const playSong = (id: number) => {
+        const songToPlay = songs.find(s => s.id === id);
+        if (songToPlay) {
+            setPlayingSong(songToPlay);
+        }
+    }
+
+    const userClickedPlaySong = (song: Song) => {
+        setUserPlayedSong(song);
     }
 
     return (
@@ -80,12 +82,12 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
             value={{
                 songs,
                 fetchSongs: fetchData,
-                playedSong,
+                playingSong,
+                userPlayedSong,
                 loadingSong,
                 setLoadingSong,
                 playSong,
-                isPlaying,
-                setIsPlaying,
+                userClickedPlaySong,
                 nextSong,
                 stop
             }}
