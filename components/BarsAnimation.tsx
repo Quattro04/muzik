@@ -1,5 +1,5 @@
 
-export default function BarsAnimaiton({ className, width, height }: { className: string, width: number, height: number }) {
+export default function BarsAnimaiton({ className, width = 50, height = 50 }: { className?: string, width?: number, height?: number }) {
 
     return (
         <div

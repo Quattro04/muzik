@@ -8,17 +8,29 @@ import { Song, useSongs } from '@/context/SongsContext'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import { useInfo } from '@/context/InfoContext'
 import { useUser } from '@/context/UserContext'
+import BarsAnimaiton from '@/components/BarsAnimation';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faArrowDown,
+    faArrowUp,
+} from "@fortawesome/free-solid-svg-icons";
 
 const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
 ];
 
+interface Sorted {
+    parameter: string;
+    desc: boolean;
+}
+
 export default function Home() {
 
     const [isLoading, setIsLoading] = useState(true)
     const [username, setUsername] = useState<string>('');
+    const [sorted, setSorted] = useState<Sorted>({ parameter: 'Added', desc: true });
 
-    const { songs, playedSong, isPlaying, fetchSongs, playSong, loadingSong, setLoadingSong } = useSongs();
+    const { songs, playedSong, isPlaying, fetchSongs, playSong, loadingSong, setLoadingSong, setSongQueue, sort} = useSongs();
     const { isMobile } = useInfo();
     const { user, setUser } = useUser();
     
@@ -29,9 +41,37 @@ export default function Home() {
         });
     }, [])
 
+    useEffect(() => {
+        sort(sorted);
+    }, [sorted])
+
+    const shuffle = (array: Song[]) => {
+        let currentIndex = array.length,  randomIndex;
+      
+        // While there remain elements to shuffle.
+        while (currentIndex != 0) {
+      
+          // Pick a remaining element.
+          randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex--;
+      
+          // And swap it with the current element.
+          [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+        }
+      
+        return array;
+      }
+
     const onPlaySong = (song: Song) => {
         setLoadingSong(song.id)
         playSong(song);
+
+        if (user) {
+            const queuedSongs = songs.filter(s => s.users.includes(user)).filter(s => s.id !== song.id);
+            shuffle(queuedSongs);
+            setSongQueue(queuedSongs);
+        }
     }
 
     const usernameSubmit = (e: FormEvent) => {
@@ -64,17 +104,32 @@ export default function Home() {
                             <span className="flex-1 text-center text-white text-xs sm:text-sm opacity-80 pointer-events-none text-slate-400">
                                 Released
                             </span>
-                            <span className="flex-1 text-right text-white text-xs sm:text-sm opacity-80 pointer-events-none text-slate-400">
-                                Added
-                            </span>
+                            <div
+                                className="flex-1 text-right flex items-center justify-end"
+                            >
+                                <div
+                                    className="flex items-center cursor-pointer"
+                                    onClick={() => setSorted({ parameter: 'Added', desc: !sorted.desc })}
+                                >
+                                    <FontAwesomeIcon
+                                        icon={sorted.desc ? faArrowDown : faArrowUp}
+                                        style={{ fontSize: 12, color: "#3d92c3", padding: '10px 15px', cursor: 'pointer' }}
+                                    />
+                                    <span
+                                        className="text-white text-xs sm:text-sm opacity-80 text-slate-400"
+                                    >
+                                        Added
+                                    </span>
+                                </div>
+                            </div>
                         </li>
                         {songs.filter(s => s.users.includes(user)).map((song, idx) =>
                             <li
                                 key={idx}
-                                className={`relative basis-12 flex items-center flex-1 py-2 sm:py-3 px-3 sm:px-6 cursor-pointer rounded ${loadingSong === song.id || playedSong?.id === song.id ? 'bg-lightblue' : ''}`}
+                                className={`relative basis-12 flex items-center flex-1 py-2 sm:py-3 px-3 sm:px-6 cursor-pointer rounded`}
                                 onClick={() => onPlaySong(song)}
                             >
-                                {loadingSong !== song.id &&
+                                {loadingSong !== song.id && (playedSong?.id !== song.id || !isPlaying) &&
                                     <div className="w-10 h-10 sm:w-12 sm:h-12 relative mr-4">
                                         <Image
                                             width={48}
@@ -91,11 +146,16 @@ export default function Home() {
                                         <LoadingSpinner width={30} height={30} />
                                     </div>
                                 }
+                                {loadingSong !== song.id && playedSong?.id === song.id && isPlaying &&
+                                    <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center mr-4">
+                                        <BarsAnimaiton />
+                                    </div>
+                                }
                                 <div className="flex grow-[2] shrink-[2] basis-0 flex-col overflow-hidden">
-                                    <span className="text-white text-xs sm:text-sm mb-1 pointer-events-none truncate">
+                                    <span className={`text-xs sm:text-sm mb-1 pointer-events-none truncate ${playedSong?.id === song.id && loadingSong !== song.id ? 'text-green' : 'text-white'}`}>
                                         {song.title}
                                     </span>
-                                    <span className="text-white text-xs sm:text-sm opacity-50 pointer-events-none truncate">
+                                    <span className="text-white text-xs sm:text-sm opacity-60 pointer-events-none truncate">
                                         {song.artist}
                                     </span>
                                 </div>

@@ -11,6 +11,8 @@ interface SongsCtx {
     setIsPlaying: (_: boolean) => void;
     nextSong: () => void;
     stop: () => void;
+    setSongQueue: (_: Song[]) => void;
+    sort: ({ parameter, desc }: { parameter: string, desc: boolean }) => void;
 };
 
 const SongsContext = createContext<SongsCtx>(
@@ -24,7 +26,9 @@ const SongsContext = createContext<SongsCtx>(
         isPlaying: false,
         setIsPlaying: () => {},
         nextSong: () => {},
-        stop: () => {}
+        stop: () => {},
+        setSongQueue: () => {},
+        sort: () => {},
     }
 );
 
@@ -48,6 +52,7 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
     const [playedSong, setPlayedSong] = useState<Song | undefined>(undefined);
     const [loadingSong, setLoadingSong] = useState<number | undefined>(undefined);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
+    const [songQueue, setSongQueue] = useState<Song[]>([]);
 
     const fetchData = async (callback?: () => void) => {
         const res = await fetch('/api/audio');
@@ -61,9 +66,16 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
         callback?.();
     }
 
+    const playSong = (song: Song) => {
+        setPlayedSong(song);
+        setLoadingSong(song.id);
+    }
+
     const nextSong = () => {
-        const randomSong = Math.floor(Math.random() * songs.length);
-        playSong(songs[randomSong]);
+        const songToPlay = songQueue.shift();
+        if (songToPlay) {
+            playSong(songToPlay);
+        }
     }
 
     const stop = () => {
@@ -71,8 +83,18 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
         setIsPlaying(false);
     }
 
-    const playSong = (song: Song) => {
-        setPlayedSong(song);
+    const sort = ({ parameter, desc }: { parameter: string, desc: boolean }) => {
+        switch (parameter) {
+            case 'Added':
+                const temp: Song[] = JSON.parse(JSON.stringify(songs));
+                const newSongs = temp.sort((a, b) => {
+                    const aDate = new Date(a.createdAt);
+                    const bDate = new Date(b.createdAt);
+                    return desc ? bDate.getTime() - aDate.getTime() : aDate.getTime() - bDate.getTime();
+                })
+                setSongs(newSongs);
+                break;
+        }
     }
 
     return (
@@ -87,7 +109,9 @@ export function SongsContextProvider({ children }: { children: ReactNode }) {
                 isPlaying,
                 setIsPlaying,
                 nextSong,
-                stop
+                stop,
+                setSongQueue,
+                sort
             }}
         >
             {children}

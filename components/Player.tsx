@@ -11,7 +11,7 @@ export default function Player() {
     const audioRef = useRef<HTMLVideoElement>(null);
     const [audioSrc, setAudioSrc] = useState<string>("");
 
-    const { playedSong, nextSong, setLoadingSong } = useSongs();
+    const { playedSong, nextSong, setLoadingSong, setIsPlaying } = useSongs();
     const [firstTime, setFirstTime] = useState<boolean>(true);
 
     useEffect(() => {
@@ -45,6 +45,13 @@ export default function Player() {
                 audioRef.current.addEventListener('loadeddata', function () {
                     setLoadingSong(undefined)
                 });
+
+                audioRef.current.addEventListener('play', () => {
+                    setIsPlaying(true);
+                });
+                audioRef.current.addEventListener('pause', () => {
+                    setIsPlaying(false);
+                });
                 setFirstTime(false);
             }
 
@@ -57,7 +64,8 @@ export default function Player() {
               
             navigator.mediaSession.metadata = metadata;
 
-            setAudioSrc(`${process.env.NEXT_PUBLIC_API_URL}/songs/${playedSong.id}.mp3`)
+            setAudioSrc(`${process.env.NEXT_PUBLIC_API_URL}/songs/${playedSong.id}.mp3`);
+            setIsPlaying(true);
         }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -65,10 +73,12 @@ export default function Player() {
 
     const play = () => {
         audioRef.current?.play();
+        setIsPlaying(true);
     }
 
     const pause = () => {
         audioRef.current?.pause();
+        setIsPlaying(false);
     }
 
     const repeatSong = () => {
