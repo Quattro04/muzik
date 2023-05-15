@@ -81,6 +81,12 @@ export default function SongUploadModal({ opened, onClose }: { opened: boolean, 
             });
 
             const response = await res.json();
+            if (response.error) {
+                setLoading(false);
+                closeModal(response);
+                return;
+            }
+
             const songId = response.song.id;
 
             // Make mp3 file with id as name and upload it to server
